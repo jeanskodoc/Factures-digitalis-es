@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -213,11 +214,11 @@
             to { opacity: 1; }
         }
         
-        .form-section, .invoice-preview, .history-section, .sales-analysis-section {
+        .form-section, .invoice-preview, .history-section, .sales-analysis-section, .verify-section {
             margin-bottom: 30px;
         }
         
-        .form-section h2, .invoice-preview h2, .history-section h2, .sales-analysis-section h2 {
+        .form-section h2, .invoice-preview h2, .history-section h2, .sales-analysis-section h2, .verify-section h2 {
             border-bottom: 2px solid var(--primary-color);
             padding-bottom: 12px;
             color: var(--primary-color);
@@ -556,6 +557,86 @@
             margin-bottom: 0;
         }
         
+        /* Section de vérification */
+        .verify-container {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .scanner-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+        
+        #scanner {
+            width: 100%;
+            border-radius: var(--radius);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .scanner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: var(--radius);
+        }
+        
+        .scanner-frame {
+            width: 70%;
+            height: 70%;
+            border: 3px solid var(--primary-color);
+            border-radius: 10px;
+            box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.3);
+        }
+        
+        .verification-result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: var(--radius);
+            text-align: center;
+            display: none;
+        }
+        
+        .verification-result.valid {
+            background-color: #e8f5e9;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .verification-result.invalid {
+            background-color: #ffebee;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+        
+        .verification-result h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .invoice-details-verification {
+            margin-top: 20px;
+            text-align: left;
+            background-color: var(--light-bg);
+            padding: 15px;
+            border-radius: var(--radius);
+        }
+        
         @media print {
             body * {
                 visibility: hidden;
@@ -639,6 +720,10 @@
                 max-width: 300px;
                 margin-right: 0;
             }
+            
+            .scanner-container {
+                max-width: 100%;
+            }
         }
         
         @media (max-width: 480px) {
@@ -707,9 +792,11 @@
             <div class="tab active" data-tab="create"><i class="fas fa-plus-circle"></i> Créer une Facture</div>
             <div class="tab" data-tab="history"><i class="fas fa-history"></i> Historique et Statistiques</div>
             <div class="tab" data-tab="sales"><i class="fas fa-chart-bar"></i> Analyse des Ventes</div>
+            <div class="tab" data-tab="verify"><i class="fas fa-qrcode"></i> Vérifier une Facture</div>
         </div>
         
         <div id="create-tab" class="tab-content active">
+            <!-- Contenu de création de facture (inchangé) -->
             <div class="form-section">
                 <h2><i class="fas fa-file-alt"></i> Informations de la Facture</h2>
                 <form id="invoiceForm">
@@ -881,6 +968,7 @@
         </div>
         
         <div id="history-tab" class="tab-content">
+            <!-- Contenu de l'historique (inchangé) -->
             <div class="history-section">
                 <h2><i class="fas fa-history"></i> Historique et Statistiques des Factures</h2>
                 
@@ -953,6 +1041,7 @@
         </div>
         
         <div id="sales-tab" class="tab-content">
+            <!-- Contenu de l'analyse des ventes (inchangé) -->
             <div class="sales-analysis-section">
                 <h2><i class="fas fa-chart-bar"></i> Analyse des Ventes</h2>
                 
@@ -1012,6 +1101,65 @@
                 </div>
             </div>
         </div>
+        
+        <!-- NOUVELLE SECTION : Vérification de facture -->
+        <div id="verify-tab" class="tab-content">
+            <div class="verify-section">
+                <h2><i class="fas fa-qrcode"></i> Vérifier l'Authenticité d'une Facture</h2>
+                
+                <div class="verify-container">
+                    <div class="form-group">
+                        <label for="verificationMethod">Méthode de vérification:</label>
+                        <select id="verificationMethod">
+                            <option value="scanner">Scanner le QR Code</option>
+                            <option value="manual">Saisie manuelle</option>
+                        </select>
+                    </div>
+                    
+                    <div id="scannerSection">
+                        <div class="scanner-container">
+                            <video id="scanner" autoplay playsinline></video>
+                            <div class="scanner-overlay" id="scannerOverlay">
+                                <div class="scanner-frame"></div>
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button type="button" id="startScanner"><i class="fas fa-camera"></i> Démarrer le scanner</button>
+                            <button type="button" id="stopScanner" class="secondary" style="display: none;"><i class="fas fa-stop"></i> Arrêter le scanner</button>
+                            <button type="button" id="uploadImage" class="secondary"><i class="fas fa-upload"></i> Charger une image</button>
+                            <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <div id="manualSection" style="display: none;">
+                        <div class="form-group">
+                            <label for="manualInvoiceCode">Code de la facture:</label>
+                            <input type="text" id="manualInvoiceCode" placeholder="Ex: ABC123#">
+                        </div>
+                        <div class="form-group">
+                            <label for="manualPaymentCode">Code de paiement:</label>
+                            <input type="text" id="manualPaymentCode" placeholder="Ex: 1234-5678-9012">
+                        </div>
+                        <div class="actions">
+                            <button type="button" id="verifyManually"><i class="fas fa-check-circle"></i> Vérifier manuellement</button>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-result" id="verificationResult">
+                        <h3 id="resultTitle"></h3>
+                        <p id="resultMessage"></p>
+                        <div class="invoice-details-verification" id="invoiceDetailsVerification" style="display: none;">
+                            <h4>Détails de la facture:</h4>
+                            <p><strong>Numéro:</strong> <span id="verifiedInvoiceNumber"></span></p>
+                            <p><strong>Client:</strong> <span id="verifiedClientName"></span></p>
+                            <p><strong>Date:</strong> <span id="verifiedDate"></span></p>
+                            <p><strong>Montant:</strong> <span id="verifiedAmount"></span></p>
+                            <p><strong>Code de facture:</strong> <span id="verifiedInvoiceCode"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1064,6 +1212,7 @@
                 let invoices = JSON.parse(localStorage.getItem('invoices')) || [];
                 let currentInvoice = null;
                 let salesChart, quantityChart, monthlyChart, distributionChart;
+                let scannerStream = null;
                 
                 // Gestion des onglets
                 document.querySelectorAll('.tab').forEach(tab => {
@@ -1079,9 +1228,228 @@
                             updateStats();
                         } else if (this.getAttribute('data-tab') === 'sales') {
                             updateCharts();
+                        } else if (this.getAttribute('data-tab') === 'verify') {
+                            // Arrêter le scanner si on quitte l'onglet
+                            stopScanner();
                         }
                     });
                 });
+                
+                // Gestion de la méthode de vérification
+                document.getElementById('verificationMethod').addEventListener('change', function() {
+                    const method = this.value;
+                    if (method === 'scanner') {
+                        document.getElementById('scannerSection').style.display = 'block';
+                        document.getElementById('manualSection').style.display = 'none';
+                    } else {
+                        document.getElementById('scannerSection').style.display = 'none';
+                        document.getElementById('manualSection').style.display = 'block';
+                        stopScanner();
+                    }
+                });
+                
+                // Démarrer le scanner
+                document.getElementById('startScanner').addEventListener('click', startScanner);
+                
+                // Arrêter le scanner
+                document.getElementById('stopScanner').addEventListener('click', stopScanner);
+                
+                // Charger une image pour analyse
+                document.getElementById('uploadImage').addEventListener('click', function() {
+                    document.getElementById('imageUpload').click();
+                });
+                
+                document.getElementById('imageUpload').addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const img = new Image();
+                        img.onload = function() {
+                            scanQRCodeFromImage(img);
+                        };
+                        img.src = URL.createObjectURL(file);
+                    }
+                });
+                
+                // Vérification manuelle
+                document.getElementById('verifyManually').addEventListener('click', function() {
+                    const invoiceCode = document.getElementById('manualInvoiceCode').value;
+                    const paymentCode = document.getElementById('manualPaymentCode').value;
+                    
+                    if (!invoiceCode || !paymentCode) {
+                        alert('Veuillez saisir les deux codes de vérification.');
+                        return;
+                    }
+                    
+                    verifyInvoice(invoiceCode, paymentCode);
+                });
+                
+                // Fonction pour démarrer le scanner
+                function startScanner() {
+                    const video = document.getElementById('scanner');
+                    const startButton = document.getElementById('startScanner');
+                    const stopButton = document.getElementById('stopScanner');
+                    const overlay = document.getElementById('scannerOverlay');
+                    
+                    // Demander l'accès à la caméra
+                    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+                        .then(function(stream) {
+                            scannerStream = stream;
+                            video.srcObject = stream;
+                            startButton.style.display = 'none';
+                            stopButton.style.display = 'inline-flex';
+                            overlay.style.display = 'none';
+                            
+                            // Démarrer la détection de QR Code
+                            scanQRCodeFromVideo(video);
+                        })
+                        .catch(function(err) {
+                            console.error("Erreur d'accès à la caméra: ", err);
+                            alert("Impossible d'accéder à la caméra. Vérifiez les permissions.");
+                        });
+                }
+                
+                // Fonction pour arrêter le scanner
+                function stopScanner() {
+                    const video = document.getElementById('scanner');
+                    const startButton = document.getElementById('startScanner');
+                    const stopButton = document.getElementById('stopScanner');
+                    const overlay = document.getElementById('scannerOverlay');
+                    
+                    if (scannerStream) {
+                        scannerStream.getTracks().forEach(track => track.stop());
+                        scannerStream = null;
+                    }
+                    
+                    video.srcObject = null;
+                    startButton.style.display = 'inline-flex';
+                    stopButton.style.display = 'none';
+                    overlay.style.display = 'flex';
+                }
+                
+                // Fonction pour scanner les QR Codes depuis la vidéo
+                function scanQRCodeFromVideo(video) {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    
+                    function scanFrame() {
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                            
+                            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                            const code = jsQR(imageData.data, imageData.width, imageData.height);
+                            
+                            if (code) {
+                                // QR Code détecté
+                                processQRCodeData(code.data);
+                                stopScanner();
+                            }
+                        }
+                        
+                        if (scannerStream) {
+                            requestAnimationFrame(scanFrame);
+                        }
+                    }
+                    
+                    scanFrame();
+                }
+                
+                // Fonction pour scanner les QR Codes depuis une image
+                function scanQRCodeFromImage(img) {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+                    
+                    if (code) {
+                        processQRCodeData(code.data);
+                    } else {
+                        alert('Aucun QR Code valide trouvé dans l\'image.');
+                    }
+                }
+                
+                // Fonction pour traiter les données du QR Code
+                function processQRCodeData(data) {
+                    try {
+                        // Le QR Code contient les données de la facture
+                        // Format: "Facture: [numéro], Code: [code], Montant: [montant], Code Paiement: [code_paiement]"
+                        const parts = data.split(', ');
+                        const invoiceNumber = parts[0].replace('Facture: ', '');
+                        const invoiceCode = parts[1].replace('Code: ', '');
+                        const amount = parts[2].replace('Montant: ', '');
+                        const paymentCode = parts[3].replace('Code Paiement: ', '');
+                        
+                        verifyInvoice(invoiceCode, paymentCode);
+                    } catch (error) {
+                        console.error('Erreur lors du traitement du QR Code:', error);
+                        showVerificationResult(false, 'Format de QR Code invalide.');
+                    }
+                }
+                
+                // Fonction pour vérifier l'authenticité d'une facture
+                function verifyInvoice(invoiceCode, paymentCode) {
+                    // Rechercher la facture dans le stockage local
+                    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
+                    const invoice = invoices.find(inv => 
+                        inv.invoiceCode === invoiceCode && inv.paymentCode === paymentCode
+                    );
+                    
+                    if (invoice) {
+                        // Facture authentique trouvée
+                        showVerificationResult(true, 'Cette facture est authentique.', invoice);
+                    } else {
+                        // Facture non trouvée ou codes incorrects
+                        showVerificationResult(false, 'Cette facture n\'a pas été trouvée dans notre système ou les codes sont incorrects.');
+                    }
+                }
+                
+                // Fonction pour afficher le résultat de la vérification
+                function showVerificationResult(isValid, message, invoice = null) {
+                    const resultDiv = document.getElementById('verificationResult');
+                    const resultTitle = document.getElementById('resultTitle');
+                    const resultMessage = document.getElementById('resultMessage');
+                    const detailsDiv = document.getElementById('invoiceDetailsVerification');
+                    
+                    // Réinitialiser l'affichage
+                    resultDiv.className = 'verification-result';
+                    detailsDiv.style.display = 'none';
+                    
+                    if (isValid) {
+                        // Facture valide
+                        resultDiv.classList.add('valid');
+                        resultTitle.innerHTML = '<i class="fas fa-check-circle"></i> Facture Authentique';
+                        resultMessage.textContent = message;
+                        
+                        // Afficher les détails de la facture
+                        if (invoice) {
+                            document.getElementById('verifiedInvoiceNumber').textContent = invoice.invoiceNumber;
+                            document.getElementById('verifiedClientName').textContent = invoice.clientName;
+                            document.getElementById('verifiedDate').textContent = formatDate(invoice.date);
+                            document.getElementById('verifiedAmount').textContent = formatCurrency(invoice.total);
+                            document.getElementById('verifiedInvoiceCode').textContent = invoice.invoiceCode;
+                            detailsDiv.style.display = 'block';
+                        }
+                    } else {
+                        // Facture invalide
+                        resultDiv.classList.add('invalid');
+                        resultTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Facture Non Valide';
+                        resultMessage.textContent = message;
+                    }
+                    
+                    resultDiv.style.display = 'block';
+                    
+                    // Faire défiler jusqu'au résultat
+                    resultDiv.scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                // Le reste du code JavaScript pour les autres fonctionnalités reste inchangé
+                // ... (code précédent pour la génération de factures, historique, etc.)
                 
                 // Générer automatiquement le code de facture
                 function generateInvoiceCode() {
@@ -1175,7 +1543,7 @@
                 const firstItemRow = document.querySelector('.item-row');
                 addItemEventListeners(firstItemRow);
                 
-                // Générer la facture - CORRECTION DES ERREURS
+                // Générer la facture
                 document.getElementById('generateInvoice').addEventListener('click', generateInvoice);
                 
                 function generateInvoice() {
