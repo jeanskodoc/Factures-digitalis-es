@@ -8,78 +8,116 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #45a049;
+            --secondary-color: #6c757d;
+            --danger-color: #f44336;
+            --success-color: #25D366;
+            --warning-color: #ff9800;
+            --light-bg: #f8f9fa;
+            --dark-text: #333;
+            --medium-text: #555;
+            --light-text: #777;
+            --border-color: #ddd;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --radius: 8px;
+        }
+        
         * {
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
             margin: 0;
             padding: 0;
-            background-color: #f5f5f5;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            color: var(--dark-text);
         }
         
         /* Écran de connexion */
         .login-container {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 40px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
+            text-align: center;
         }
         
         .login-container h1 {
-            text-align: center;
-            color: #333;
+            color: var(--primary-color);
             margin-bottom: 30px;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .login-form .form-group {
             margin-bottom: 20px;
+            text-align: left;
         }
         
         .login-form label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--medium-text);
         }
         
         .login-form input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
             font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .login-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
         
         .login-button {
             width: 100%;
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px;
-            border-radius: 4px;
+            padding: 14px;
+            border-radius: var(--radius);
             cursor: pointer;
             font-size: 16px;
-            transition: background-color 0.3s;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .login-button:hover {
-            background-color: #45a049;
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
         }
         
         .error-message {
-            color: red;
+            color: var(--danger-color);
             text-align: center;
-            margin-top: 10px;
+            margin-top: 15px;
             display: none;
+            font-weight: 500;
         }
         
         /* Application principale */
@@ -89,53 +127,75 @@
             max-width: 1200px;
             margin: 20px auto;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
         
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #4CAF50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
         }
         
         .app-header h1 {
             margin: 0;
-            color: #333;
+            color: var(--dark-text);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .logout-button {
-            background-color: #f44336;
+            background-color: var(--danger-color);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            padding: 10px 18px;
+            border-radius: var(--radius);
             cursor: pointer;
             font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logout-button:hover {
+            background-color: #d32f2f;
         }
         
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #ddd;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
+            gap: 5px;
         }
         
         .tab {
-            padding: 10px 20px;
+            padding: 12px 24px;
             cursor: pointer;
-            background-color: #f1f1f1;
-            margin-right: 5px;
-            border-radius: 5px 5px 0 0;
+            background-color: var(--light-bg);
+            border-radius: var(--radius) var(--radius) 0 0;
             white-space: nowrap;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tab:hover {
+            background-color: #e9ecef;
         }
         
         .tab.active {
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
         }
         
@@ -145,6 +205,12 @@
         
         .tab-content.active {
             display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         .form-section, .invoice-preview, .history-section, .sales-analysis-section {
@@ -152,56 +218,71 @@
         }
         
         .form-section h2, .invoice-preview h2, .history-section h2, .sales-analysis-section h2 {
-            border-bottom: 2px solid #4CAF50;
-            padding-bottom: 10px;
-            color: #4CAF50;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 12px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .form-row {
             display: flex;
             flex-wrap: wrap;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            gap: 15px;
         }
         
         .form-group {
             flex: 1 1 300px;
-            margin-right: 15px;
-            margin-bottom: 15px;
         }
         
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #555;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--medium-text);
         }
         
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
             font-size: 16px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
         }
         
         button {
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             padding: 12px 20px;
-            border-radius: 4px;
+            border-radius: var(--radius);
             cursor: pointer;
             font-size: 16px;
+            font-weight: 600;
             margin-right: 10px;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         
         button:hover {
-            background-color: #45a049;
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
         
         button.whatsapp {
-            background-color: #25D366;
+            background-color: var(--success-color);
         }
         
         button.whatsapp:hover {
@@ -209,7 +290,7 @@
         }
         
         button.secondary {
-            background-color: #6c757d;
+            background-color: var(--secondary-color);
         }
         
         button.secondary:hover {
@@ -217,7 +298,7 @@
         }
         
         button.analysis {
-            background-color: #ff9800;
+            background-color: var(--warning-color);
         }
         
         button.analysis:hover {
@@ -225,13 +306,15 @@
         }
         
         .invoice-container {
-            border: 2px solid #4CAF50;
-            padding: 20px;
+            border: 2px solid var(--primary-color);
+            padding: 25px;
             background-color: white;
             position: relative;
             width: 100%;
             max-width: 800px;
             margin: 0 auto;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         
         .invoice-header {
@@ -239,6 +322,7 @@
             justify-content: space-between;
             margin-bottom: 30px;
             flex-wrap: wrap;
+            gap: 20px;
         }
         
         .company-info {
@@ -263,16 +347,18 @@
             border-collapse: collapse;
             margin: 20px 0;
             font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .invoice-table th, .invoice-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            border: 1px solid var(--border-color);
+            padding: 10px;
             text-align: left;
         }
         
         .invoice-table th {
-            background-color: #f2f2f2;
+            background-color: var(--light-bg);
+            font-weight: 600;
         }
         
         .total-row {
@@ -285,6 +371,7 @@
             justify-content: space-between;
             margin-top: 50px;
             flex-wrap: wrap;
+            gap: 20px;
         }
         
         .signature-section {
@@ -316,41 +403,51 @@
             font-size: 18px;
             letter-spacing: 3px;
             background-color: #f0f0f0;
-            padding: 5px 10px;
+            padding: 8px 15px;
             display: inline-block;
             margin: 10px 0;
+            border-radius: var(--radius);
+            border: 1px dashed #ccc;
         }
         
         .invoice-code {
             font-family: monospace;
             font-size: 16px;
             background-color: #e9f7ef;
-            padding: 5px 10px;
-            border-radius: 4px;
+            padding: 8px 15px;
+            border-radius: var(--radius);
             display: inline-block;
             margin: 5px 0;
+            font-weight: 600;
         }
         
         .actions {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
         }
         
         .pdf-format-selector {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
         }
         
         .pdf-format-selector label {
-            display: inline-block;
-            margin-right: 15px;
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+            cursor: pointer;
+            gap: 5px;
         }
         
         .filter-section {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            background-color: var(--light-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            margin-bottom: 25px;
         }
         
         .filter-row {
@@ -368,16 +465,23 @@
         }
         
         .stat-card {
-            background-color: #f8f9fa;
-            border-left: 4px solid #4CAF50;
-            padding: 15px;
-            border-radius: 5px;
+            background-color: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
-            color: #4CAF50;
+            color: var(--primary-color);
+            margin: 10px 0;
         }
         
         .history-table {
@@ -385,43 +489,52 @@
             border-collapse: collapse;
             margin-top: 20px;
             font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .history-table th, .history-table td {
-            border: 1px solid #ddd;
-            padding: 10px;
+            border: 1px solid var(--border-color);
+            padding: 12px;
             text-align: left;
         }
         
         .history-table th {
-            background-color: #4CAF50;
+            background-color: var(--primary-color);
             color: white;
         }
         
         .history-table tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: var(--light-bg);
         }
         
         /* Analyse des ventes */
         .charts-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 20px;
+            gap: 25px;
             margin-top: 20px;
         }
         
         .chart-card {
             background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
             padding: 20px;
+            transition: transform 0.3s;
+        }
+        
+        .chart-card:hover {
+            transform: translateY(-5px);
         }
         
         .chart-card h3 {
             margin-top: 0;
-            color: #333;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
+            color: var(--dark-text);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .chart-container {
@@ -467,7 +580,7 @@
             }
             
             .app-container {
-                padding: 10px;
+                padding: 15px;
                 margin: 10px auto;
             }
             
@@ -489,7 +602,7 @@
             }
             
             .invoice-table th, .invoice-table td {
-                padding: 5px;
+                padding: 8px;
             }
             
             .tabs {
@@ -498,7 +611,7 @@
             }
             
             .tab {
-                padding: 8px 15px;
+                padding: 10px 18px;
                 font-size: 14px;
             }
             
@@ -515,11 +628,22 @@
             .chart-container {
                 height: 250px;
             }
+            
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .actions button {
+                width: 100%;
+                max-width: 300px;
+                margin-right: 0;
+            }
         }
         
         @media (max-width: 480px) {
             .login-container {
-                padding: 20px;
+                padding: 25px;
             }
             
             .app-header {
@@ -534,7 +658,6 @@
             
             .form-group {
                 flex: 1 1 100%;
-                margin-right: 0;
             }
             
             .invoice-title h1 {
@@ -558,72 +681,72 @@
 <body>
     <!-- Écran de connexion -->
     <div class="login-container" id="loginContainer">
-        <h1>Connexion</h1>
+        <h1><i class="fas fa-file-invoice-dollar"></i> Connexion</h1>
         <form class="login-form" id="loginForm">
             <div class="form-group">
-                <label for="username">Identifiant</label>
+                <label for="username"><i class="fas fa-user"></i> Identifiant</label>
                 <input type="text" id="username" required>
             </div>
             <div class="form-group">
-                <label for="password">Mot de passe</label>
+                <label for="password"><i class="fas fa-lock"></i> Mot de passe</label>
                 <input type="password" id="password" required>
             </div>
-            <button type="submit" class="login-button">Se connecter</button>
-            <div class="error-message" id="errorMessage">Identifiant ou mot de passe incorrect</div>
+            <button type="submit" class="login-button"><i class="fas fa-sign-in-alt"></i> Se connecter</button>
+            <div class="error-message" id="errorMessage"><i class="fas fa-exclamation-triangle"></i> Identifiant ou mot de passe incorrect</div>
         </form>
     </div>
 
     <!-- Application principale -->
     <div class="app-container" id="appContainer">
         <div class="app-header">
-            <h1>Gestionnaire de Factures Sécurisées</h1>
-            <button class="logout-button" id="logoutButton">Déconnexion</button>
+            <h1><i class="fas fa-file-invoice-dollar"></i> Gestionnaire de Factures Sécurisées</h1>
+            <button class="logout-button" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
         </div>
         
         <div class="tabs">
-            <div class="tab active" data-tab="create">Créer une Facture</div>
-            <div class="tab" data-tab="history">Historique et Statistiques</div>
-            <div class="tab" data-tab="sales">Analyse des Ventes</div>
+            <div class="tab active" data-tab="create"><i class="fas fa-plus-circle"></i> Créer une Facture</div>
+            <div class="tab" data-tab="history"><i class="fas fa-history"></i> Historique et Statistiques</div>
+            <div class="tab" data-tab="sales"><i class="fas fa-chart-bar"></i> Analyse des Ventes</div>
         </div>
         
         <div id="create-tab" class="tab-content active">
             <div class="form-section">
-                <h2>Informations de la Facture</h2>
+                <h2><i class="fas fa-file-alt"></i> Informations de la Facture</h2>
                 <form id="invoiceForm">
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="date">Date de la facture</label>
+                            <label for="date"><i class="fas fa-calendar-alt"></i> Date de la facture</label>
                             <input type="date" id="date" required>
                         </div>
                         <div class="form-group">
-                            <label for="companyName">Nom de l'entreprise</label>
+                            <label for="companyName"><i class="fas fa-building"></i> Nom de l'entreprise</label>
                             <input type="text" id="companyName" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="companyAddress">Adresse de l'entreprise</label>
+                            <label for="companyAddress"><i class="fas fa-map-marker-alt"></i> Adresse de l'entreprise</label>
                             <textarea id="companyAddress" rows="3" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="clientName">Nom du client</label>
+                            <label for="clientName"><i class="fas fa-user-tie"></i> Nom du client</label>
                             <input type="text" id="clientName" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="ownerName">Nom du propriétaire</label>
+                            <label for="ownerName"><i class="fas fa-user"></i> Nom du propriétaire</label>
                             <input type="text" id="ownerName" required>
                         </div>
                         <div class="form-group">
-                            <label for="invoiceNumber">Numéro de facture</label>
+                            <label for="invoiceNumber"><i class="fas fa-hashtag"></i> Numéro de facture</label>
                             <input type="text" id="invoiceNumber" required>
                         </div>
                     </div>
                     
-                    <h3>Articles / Services</h3>
+                    <h3><i class="fas fa-shopping-cart"></i> Articles / Services</h3>
                     <div id="itemsContainer">
                         <div class="item-row form-row">
                             <div class="form-group">
@@ -660,17 +783,17 @@
                     </div>
                     
                     <div class="form-row">
-                        <button type="button" id="addItem">Ajouter un article</button>
+                        <button type="button" id="addItem"><i class="fas fa-plus"></i> Ajouter un article</button>
                     </div>
                     
                     <div class="actions">
-                        <button type="button" id="generateInvoice">Générer la facture</button>
+                        <button type="button" id="generateInvoice"><i class="fas fa-file-invoice"></i> Générer la facture</button>
                     </div>
                 </form>
             </div>
             
             <div class="invoice-preview" id="invoicePreview" style="display: none;">
-                <h2>Aperçu de la Facture</h2>
+                <h2><i class="fas fa-eye"></i> Aperçu de la Facture</h2>
                 <div class="invoice-container" id="invoiceContainer">
                     <div class="invoice-header">
                         <div class="company-info">
@@ -749,20 +872,20 @@
                 </div>
                 
                 <div class="actions no-print">
-                    <button type="button" id="downloadPDF">Télécharger en PDF</button>
-                    <button type="button" id="printInvoice">Imprimer la facture</button>
-                    <button type="button" id="sendWhatsApp" class="whatsapp">Envoyer par WhatsApp</button>
-                    <button type="button" id="saveInvoice" class="secondary">Sauvegarder la facture</button>
+                    <button type="button" id="downloadPDF"><i class="fas fa-file-pdf"></i> Télécharger en PDF</button>
+                    <button type="button" id="printInvoice"><i class="fas fa-print"></i> Imprimer la facture</button>
+                    <button type="button" id="sendWhatsApp" class="whatsapp"><i class="fab fa-whatsapp"></i> Envoyer par WhatsApp</button>
+                    <button type="button" id="saveInvoice" class="secondary"><i class="fas fa-save"></i> Sauvegarder la facture</button>
                 </div>
             </div>
         </div>
         
         <div id="history-tab" class="tab-content">
             <div class="history-section">
-                <h2>Historique et Statistiques des Factures</h2>
+                <h2><i class="fas fa-history"></i> Historique et Statistiques des Factures</h2>
                 
                 <div class="filter-section">
-                    <h3>Filtres</h3>
+                    <h3><i class="fas fa-filter"></i> Filtres</h3>
                     <div class="filter-row">
                         <div class="form-group">
                             <label for="filterDate">Filtrer par date:</label>
@@ -788,30 +911,30 @@
                         </div>
                     </div>
                     <div class="filter-row">
-                        <button type="button" id="applyFilters">Appliquer les filtres</button>
-                        <button type="button" id="clearFilters" class="secondary">Effacer les filtres</button>
+                        <button type="button" id="applyFilters"><i class="fas fa-check"></i> Appliquer les filtres</button>
+                        <button type="button" id="clearFilters" class="secondary"><i class="fas fa-times"></i> Effacer les filtres</button>
                     </div>
                 </div>
                 
                 <div class="stats-container">
                     <div class="stat-card">
-                        <h3>Total du jour</h3>
+                        <h3><i class="fas fa-calendar-day"></i> Total du jour</h3>
                         <div class="stat-value" id="dailyTotal">0 FCFA</div>
                         <p id="dailyCount">0 facture(s)</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Total du mois</h3>
+                        <h3><i class="fas fa-calendar-month"></i> Total du mois</h3>
                         <div class="stat-value" id="monthlyTotal">0 FCFA</div>
                         <p id="monthlyCount">0 facture(s)</p>
                     </div>
                     <div class="stat-card">
-                        <h3>Total par article</h3>
+                        <h3><i class="fas fa-box"></i> Total par article</h3>
                         <div class="stat-value" id="articleTotal">0 FCFA</div>
                         <p id="articleCount">0 article(s)</p>
                     </div>
                 </div>
                 
-                <h3>Liste des factures</h3>
+                <h3><i class="fas fa-list"></i> Liste des factures</h3>
                 <table class="history-table">
                     <thead>
                         <tr>
@@ -831,10 +954,10 @@
         
         <div id="sales-tab" class="tab-content">
             <div class="sales-analysis-section">
-                <h2>Analyse des Ventes</h2>
+                <h2><i class="fas fa-chart-bar"></i> Analyse des Ventes</h2>
                 
                 <div class="filter-section">
-                    <h3>Filtres d'analyse</h3>
+                    <h3><i class="fas fa-filter"></i> Filtres d'analyse</h3>
                     <div class="analysis-controls">
                         <div class="form-group">
                             <label for="analysisMonth">Mois:</label>
@@ -854,34 +977,34 @@
                                 <option value="autre">Autre</option>
                             </select>
                         </div>
-                        <button type="button" id="updateCharts" class="analysis">Mettre à jour les graphiques</button>
+                        <button type="button" id="updateCharts" class="analysis"><i class="fas fa-sync-alt"></i> Mettre à jour les graphiques</button>
                     </div>
                 </div>
                 
                 <div class="charts-container">
                     <div class="chart-card">
-                        <h3>Ventes par Article (Montant)</h3>
+                        <h3><i class="fas fa-chart-bar"></i> Ventes par Article (Montant)</h3>
                         <div class="chart-container">
                             <canvas id="salesByArticleChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="chart-card">
-                        <h3>Ventes par Article (Quantité)</h3>
+                        <h3><i class="fas fa-chart-line"></i> Ventes par Article (Quantité)</h3>
                         <div class="chart-container">
                             <canvas id="quantityByArticleChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="chart-card">
-                        <h3>Évolution des Ventes Mensuelles</h3>
+                        <h3><i class="fas fa-chart-area"></i> Évolution des Ventes Mensuelles</h3>
                         <div class="chart-container">
                             <canvas id="monthlySalesChart"></canvas>
                         </div>
                     </div>
                     
                     <div class="chart-card">
-                        <h3>Répartition des Ventes</h3>
+                        <h3><i class="fas fa-chart-pie"></i> Répartition des Ventes</h3>
                         <div class="chart-container">
                             <canvas id="salesDistributionChart"></canvas>
                         </div>
@@ -1052,7 +1175,7 @@
                 const firstItemRow = document.querySelector('.item-row');
                 addItemEventListeners(firstItemRow);
                 
-                // Générer la facture
+                // Générer la facture - CORRECTION DES ERREURS
                 document.getElementById('generateInvoice').addEventListener('click', generateInvoice);
                 
                 function generateInvoice() {
@@ -1154,6 +1277,9 @@
                     
                     // Afficher l'aperçu
                     document.getElementById('invoicePreview').style.display = 'block';
+                    
+                    // Faire défiler jusqu'à l'aperçu
+                    document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth' });
                 }
                 
                 // Télécharger en PDF
@@ -1311,8 +1437,8 @@
                             <td>${itemsList}</td>
                             <td>${formatCurrency(invoice.total)}</td>
                             <td>
-                                <button class="view-invoice" data-id="${invoice.timestamp}">Voir</button>
-                                <button class="delete-invoice" data-id="${invoice.timestamp}">Supprimer</button>
+                                <button class="view-invoice" data-id="${invoice.timestamp}"><i class="fas fa-eye"></i> Voir</button>
+                                <button class="delete-invoice" data-id="${invoice.timestamp}"><i class="fas fa-trash"></i> Supprimer</button>
                             </td>
                         `;
                         
