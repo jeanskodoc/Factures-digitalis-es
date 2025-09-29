@@ -306,6 +306,30 @@
             background-color: #e68900;
         }
         
+        button.reset {
+            background-color: #9C27B0;
+        }
+        
+        button.reset:hover {
+            background-color: #7B1FA2;
+        }
+        
+        button.export {
+            background-color: #2196F3;
+        }
+        
+        button.export:hover {
+            background-color: #0b7dda;
+        }
+        
+        button.import {
+            background-color: #FF9800;
+        }
+        
+        button.import:hover {
+            background-color: #e68900;
+        }
+        
         .invoice-container {
             border: 2px solid var(--primary-color);
             padding: 25px;
@@ -875,6 +899,7 @@
                     
                     <div class="actions">
                         <button type="button" id="generateInvoice"><i class="fas fa-file-invoice"></i> Générer la facture</button>
+                        <button type="button" id="resetInvoice" class="reset"><i class="fas fa-redo"></i> Nouvelle facture</button>
                     </div>
                 </form>
             </div>
@@ -963,6 +988,8 @@
                     <button type="button" id="printInvoice"><i class="fas fa-print"></i> Imprimer la facture</button>
                     <button type="button" id="sendWhatsApp" class="whatsapp"><i class="fab fa-whatsapp"></i> Envoyer par WhatsApp</button>
                     <button type="button" id="saveInvoice" class="secondary"><i class="fas fa-save"></i> Sauvegarder la facture</button>
+                    <button type="button" id="exportInvoice" class="export"><i class="fas fa-file-export"></i> Exporter en JSON</button>
+                    <button type="button" id="resetFromPreview" class="reset"><i class="fas fa-redo"></i> Nouvelle facture</button>
                 </div>
             </div>
         </div>
@@ -1001,6 +1028,9 @@
                     <div class="filter-row">
                         <button type="button" id="applyFilters"><i class="fas fa-check"></i> Appliquer les filtres</button>
                         <button type="button" id="clearFilters" class="secondary"><i class="fas fa-times"></i> Effacer les filtres</button>
+                        <button type="button" id="exportAllInvoices" class="export"><i class="fas fa-file-export"></i> Exporter toutes les factures</button>
+                        <button type="button" id="importInvoices" class="import"><i class="fas fa-file-import"></i> Importer des factures</button>
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
                     </div>
                 </div>
                 
@@ -1448,6 +1478,154 @@
                     resultDiv.scrollIntoView({ behavior: 'smooth' });
                 }
                 
+                // NOUVEAU: Bouton de réinitialisation
+                document.getElementById('resetInvoice').addEventListener('click', resetInvoiceForm);
+                document.getElementById('resetFromPreview').addEventListener('click', resetInvoiceForm);
+                
+                // Fonction pour réinitialiser le formulaire de facture
+                function resetInvoiceForm() {
+                    document.getElementById('invoiceForm').reset();
+                    document.getElementById('invoicePreview').style.display = 'none';
+                    
+                    // Réinitialiser les articles (garder seulement le premier)
+                    const itemsContainer = document.getElementById('itemsContainer');
+                    while (itemsContainer.children.length > 1) {
+                        itemsContainer.removeChild(itemsContainer.lastChild);
+                    }
+                    
+                    // Réinitialiser le premier article
+                    const firstItemRow = itemsContainer.querySelector('.item-row');
+                    firstItemRow.querySelector('.item-type').value = '';
+                    firstItemRow.querySelector('.item-description').value = '';
+                    firstItemRow.querySelector('.item-quantity').value = '1';
+                    firstItemRow.querySelector('.item-price').value = '';
+                    firstItemRow.querySelector('.item-total').value = '';
+                    
+                    currentInvoice = null;
+                    
+                    // Faire défiler vers le haut du formulaire
+                    document.getElementById('invoiceForm').scrollIntoView({ behavior: 'smooth' });
+                }
+                
+                // NOUVEAU: Bouton d'exportation d'une facture
+                document.getElementById('exportInvoice').addEventListener('click', function() {
+                    if (!currentInvoice) {
+                        alert('Veuillez d\'abord générer une facture.');
+                        return;
+                    }
+                    
+                    exportInvoice(currentInvoice);
+                });
+                
+                // NOUVEAU: Bouton d'exportation de toutes les factures
+                document.getElementById('exportAllInvoices').addEventListener('click', function() {
+                    if (invoices.length === 0) {
+                        alert('Aucune facture à exporter.');
+                        return;
+                    }
+                    
+                    exportAllInvoices();
+                });
+                
+                // NOUVEAU: Bouton d'importation de factures
+                document.getElementById('importInvoices').addEventListener('click', function() {
+                    document.getElementById('importFile').click();
+                });
+                
+                document.getElementById('importFile').addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            try {
+                                const importedInvoices = JSON.parse(event.target.result);
+                                importInvoices(importedInvoices);
+                            } catch (error) {
+                                alert('Erreur lors de l\'importation: le fichier n\'est pas un JSON valide.');
+                                console.error(error);
+                            }
+                        };
+                        
+                        reader.readAsText(file);
+                    }
+                });
+                
+                // Fonction pour exporter une facture en JSON
+                function exportInvoice(invoice) {
+                    const dataStr = JSON.stringify(invoice, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = `facture_${invoice.invoiceNumber}.json`;
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                }
+                
+                // Fonction pour exporter toutes les factures en JSON
+                function exportAllInvoices() {
+                    const dataStr = JSON.stringify(invoices, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = `factures_${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                }
+                
+                // Fonction pour importer des factures
+                function importInvoices(importedInvoices) {
+                    if (!Array.isArray(importedInvoices)) {
+                        alert('Format de fichier invalide. Le fichier doit contenir un tableau de factures.');
+                        return;
+                    }
+                    
+                    // Vérifier que chaque facture a les champs requis
+                    const validInvoices = importedInvoices.filter(invoice => {
+                        return invoice.date && invoice.invoiceNumber && invoice.clientName && invoice.total;
+                    });
+                    
+                    if (validInvoices.length === 0) {
+                        alert('Aucune facture valide trouvée dans le fichier.');
+                        return;
+                    }
+                    
+                    // Ajouter les factures importées à la liste existante
+                    const existingInvoiceNumbers = invoices.map(inv => inv.invoiceNumber);
+                    let newInvoicesCount = 0;
+                    
+                    validInvoices.forEach(invoice => {
+                        // Générer un nouveau timestamp si manquant
+                        if (!invoice.timestamp) {
+                            invoice.timestamp = new Date().getTime();
+                        }
+                        
+                        // Vérifier si la facture existe déjà
+                        if (!existingInvoiceNumbers.includes(invoice.invoiceNumber)) {
+                            invoices.push(invoice);
+                            newInvoicesCount++;
+                        }
+                    });
+                    
+                    // Sauvegarder dans le stockage local
+                    localStorage.setItem('invoices', JSON.stringify(invoices));
+                    
+                    // Mettre à jour l'affichage
+                    if (document.getElementById('history-tab').classList.contains('active')) {
+                        loadInvoices();
+                        updateStats();
+                    }
+                    
+                    alert(`${newInvoicesCount} nouvelle(s) facture(s) importée(s) avec succès.`);
+                    
+                    // Réinitialiser le champ de fichier
+                    document.getElementById('importFile').value = '';
+                }
+                
                 // Le reste du code JavaScript pour les autres fonctionnalités reste inchangé
                 // ... (code précédent pour la génération de factures, historique, etc.)
                 
@@ -1807,6 +1985,7 @@
                             <td>
                                 <button class="view-invoice" data-id="${invoice.timestamp}"><i class="fas fa-eye"></i> Voir</button>
                                 <button class="delete-invoice" data-id="${invoice.timestamp}"><i class="fas fa-trash"></i> Supprimer</button>
+                                <button class="export-invoice" data-id="${invoice.timestamp}"><i class="fas fa-file-export"></i> Exporter</button>
                             </td>
                         `;
                         
@@ -1825,6 +2004,16 @@
                         button.addEventListener('click', function() {
                             const invoiceId = this.getAttribute('data-id');
                             deleteInvoice(invoiceId);
+                        });
+                    });
+                    
+                    document.querySelectorAll('.export-invoice').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const invoiceId = this.getAttribute('data-id');
+                            const invoice = invoices.find(inv => inv.timestamp == invoiceId);
+                            if (invoice) {
+                                exportInvoice(invoice);
+                            }
                         });
                     });
                 }
