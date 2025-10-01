@@ -151,6 +151,11 @@
             gap: 10px;
         }
         
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
         .logout-button {
             background-color: var(--danger-color);
             color: white;
@@ -168,6 +173,25 @@
         
         .logout-button:hover {
             background-color: #d32f2f;
+        }
+        
+        .backup-button {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .backup-button:hover {
+            background-color: #5a6268;
         }
         
         .tabs {
@@ -421,6 +445,13 @@
         #qrcode {
             display: inline-block;
             margin: 10px auto;
+            width: 128px;
+            height: 128px;
+        }
+        
+        #qrcode canvas, #qrcode img {
+            width: 100% !important;
+            height: 100% !important;
         }
         
         .payment-code {
@@ -661,6 +692,32 @@
             border-radius: var(--radius);
         }
         
+        /* Notifications de sauvegarde */
+        .save-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success-color);
+            color: white;
+            padding: 15px 20px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+        }
+        
+        .save-notification.show {
+            transform: translateX(0);
+        }
+        
+        .save-notification.error {
+            background-color: var(--danger-color);
+        }
+        
         @media print {
             body * {
                 visibility: hidden;
@@ -687,6 +744,16 @@
             .app-container {
                 padding: 15px;
                 margin: 10px auto;
+            }
+            
+            .app-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header-buttons {
+                width: 100%;
+                justify-content: space-between;
             }
             
             .invoice-header, .invoice-footer {
@@ -748,6 +815,17 @@
             .scanner-container {
                 max-width: 100%;
             }
+            
+            .save-notification {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                transform: translateY(-100px);
+            }
+            
+            .save-notification.show {
+                transform: translateY(0);
+            }
         }
         
         @media (max-width: 480px) {
@@ -755,14 +833,8 @@
                 padding: 25px;
             }
             
-            .app-header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
             .app-header h1 {
                 font-size: 1.5rem;
-                margin-bottom: 10px;
             }
             
             .form-group {
@@ -809,7 +881,10 @@
     <div class="app-container" id="appContainer">
         <div class="app-header">
             <h1><i class="fas fa-file-invoice-dollar"></i> Gestionnaire de Factures Sécurisées</h1>
-            <button class="logout-button" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+            <div class="header-buttons">
+                <button class="logout-button" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+                <button class="backup-button" id="backupButton" title="Sauvegarde automatique activée"><i class="fas fa-shield-alt"></i> Sauvegarde</button>
+            </div>
         </div>
         
         <div class="tabs">
@@ -819,8 +894,8 @@
             <div class="tab" data-tab="verify"><i class="fas fa-qrcode"></i> Vérifier une Facture</div>
         </div>
         
+        <!-- Onglet Création de facture -->
         <div id="create-tab" class="tab-content active">
-            <!-- Contenu de création de facture (inchangé) -->
             <div class="form-section">
                 <h2><i class="fas fa-file-alt"></i> Informations de la Facture</h2>
                 <form id="invoiceForm">
@@ -831,14 +906,14 @@
                         </div>
                         <div class="form-group">
                             <label for="companyName"><i class="fas fa-building"></i> Nom de l'entreprise</label>
-                            <input type="text" id="companyName" required>
+                            <input type="text" id="companyName" value="JEANSKODOC" required>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
                             <label for="companyAddress"><i class="fas fa-map-marker-alt"></i> Adresse de l'entreprise</label>
-                            <textarea id="companyAddress" rows="3" required></textarea>
+                            <textarea id="companyAddress" rows="3" required>Kara-Togo</textarea>
                         </div>
                         <div class="form-group">
                             <label for="clientName"><i class="fas fa-user-tie"></i> Nom du client</label>
@@ -849,7 +924,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="ownerName"><i class="fas fa-user"></i> Nom du propriétaire</label>
-                            <input type="text" id="ownerName" required>
+                            <input type="text" id="ownerName" value="M. KOLA" required>
                         </div>
                         <div class="form-group">
                             <label for="invoiceNumber"><i class="fas fa-hashtag"></i> Numéro de facture</label>
@@ -994,8 +1069,8 @@
             </div>
         </div>
         
+        <!-- Onglet Historique -->
         <div id="history-tab" class="tab-content">
-            <!-- Contenu de l'historique (inchangé) -->
             <div class="history-section">
                 <h2><i class="fas fa-history"></i> Historique et Statistiques des Factures</h2>
                 
@@ -1031,6 +1106,7 @@
                         <button type="button" id="exportAllInvoices" class="export"><i class="fas fa-file-export"></i> Exporter toutes les factures</button>
                         <button type="button" id="importInvoices" class="import"><i class="fas fa-file-import"></i> Importer des factures</button>
                         <input type="file" id="importFile" accept=".json" style="display: none;">
+                        <button type="button" id="manualBackup" class="secondary"><i class="fas fa-cloud-download-alt"></i> Sauvegarde manuelle</button>
                     </div>
                 </div>
                 
@@ -1070,8 +1146,8 @@
             </div>
         </div>
         
+        <!-- Onglet Analyse des ventes -->
         <div id="sales-tab" class="tab-content">
-            <!-- Contenu de l'analyse des ventes (inchangé) -->
             <div class="sales-analysis-section">
                 <h2><i class="fas fa-chart-bar"></i> Analyse des Ventes</h2>
                 
@@ -1132,7 +1208,7 @@
             </div>
         </div>
         
-        <!-- NOUVELLE SECTION : Vérification de facture -->
+        <!-- Onglet Vérification -->
         <div id="verify-tab" class="tab-content">
             <div class="verify-section">
                 <h2><i class="fas fa-qrcode"></i> Vérifier l'Authenticité d'une Facture</h2>
@@ -1192,6 +1268,12 @@
         </div>
     </div>
 
+    <!-- Notification de sauvegarde -->
+    <div class="save-notification" id="saveNotification">
+        <i class="fas fa-check-circle"></i>
+        <span id="saveMessage">Sauvegarde automatique réussie</span>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Vérifier si l'utilisateur est déjà connecté
@@ -1243,7 +1325,323 @@
                 let currentInvoice = null;
                 let salesChart, quantityChart, monthlyChart, distributionChart;
                 let scannerStream = null;
+                let autoSaveInterval;
+                let lastBackupTime = localStorage.getItem('lastBackupTime') || 0;
                 
+                // Initialiser automatiquement la date du jour
+                function initializeCurrentDate() {
+                    const today = new Date();
+                    const formattedDate = today.toISOString().split('T')[0];
+                    document.getElementById('date').value = formattedDate;
+                }
+                
+                // Générer automatiquement un numéro de facture
+                function generateInvoiceNumber() {
+                    const today = new Date();
+                    const year = today.getFullYear();
+                    const month = String(today.getMonth() + 1).padStart(2, '0');
+                    const day = String(today.getDate()).padStart(2, '0');
+                    
+                    // Compter le nombre de factures créées aujourd'hui
+                    const todayInvoices = invoices.filter(inv => {
+                        const invoiceDate = new Date(inv.date);
+                        return invoiceDate.toDateString() === today.toDateString();
+                    });
+                    
+                    const sequence = String(todayInvoices.length + 1).padStart(3, '0');
+                    return `FACT-${year}${month}${day}-${sequence}`;
+                }
+                
+                // CORRECTION : Appeler l'initialisation au démarrage et à chaque nouvelle facture
+                function initializeNewInvoice() {
+                    initializeCurrentDate();
+                    document.getElementById('invoiceNumber').value = generateInvoiceNumber();
+                    document.getElementById('clientName').value = '';
+                    
+                    // Réinitialiser les articles
+                    const itemsContainer = document.getElementById('itemsContainer');
+                    while (itemsContainer.children.length > 1) {
+                        itemsContainer.removeChild(itemsContainer.lastChild);
+                    }
+                    
+                    const firstItemRow = itemsContainer.querySelector('.item-row');
+                    firstItemRow.querySelector('.item-type').value = '';
+                    firstItemRow.querySelector('.item-description').value = '';
+                    firstItemRow.querySelector('.item-quantity').value = '1';
+                    firstItemRow.querySelector('.item-price').value = '';
+                    firstItemRow.querySelector('.item-total').value = '';
+                    
+                    currentInvoice = null;
+                    document.getElementById('invoicePreview').style.display = 'none';
+                }
+                
+                // Appeler l'initialisation au démarrage
+                initializeNewInvoice();
+                
+                // CORRECTION : Fonction améliorée pour convertir les nombres en lettres
+                function numberToFrenchWords(num) {
+                    if (num === 0) return 'zéro';
+                    
+                    const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
+                    const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
+                    const tens = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt', 'quatre-vingt-dix'];
+                    
+                    function convertBelow1000(n) {
+                        if (n === 0) return '';
+                        
+                        if (n < 10) return units[n];
+                        if (n < 20) return teens[n - 10];
+                        
+                        if (n < 100) {
+                            const ten = Math.floor(n / 10);
+                            const unit = n % 10;
+                            
+                            if (ten === 7 || ten === 9) {
+                                // Cas spéciaux pour soixante-dix et quatre-vingt-dix
+                                const base = ten === 7 ? 60 : 80;
+                                const remainder = n - base;
+                                if (remainder === 0) return tens[ten];
+                                if (remainder === 1) return tens[ten] + '-et-un';
+                                return tens[ten] + '-' + convertBelow1000(remainder);
+                            }
+                            
+                            if (unit === 0) return tens[ten];
+                            if (unit === 1) return tens[ten] + '-et-un';
+                            return tens[ten] + '-' + units[unit];
+                        }
+                        
+                        // 100 à 999
+                        const hundred = Math.floor(n / 100);
+                        const remainder = n % 100;
+                        
+                        if (hundred === 1) {
+                            if (remainder === 0) return 'cent';
+                            return 'cent ' + convertBelow1000(remainder);
+                        } else {
+                            if (remainder === 0) return units[hundred] + ' cents';
+                            return units[hundred] + ' cent ' + convertBelow1000(remainder);
+                        }
+                    }
+                    
+                    let result = '';
+                    let remaining = Math.floor(num);
+                    
+                    // Millions
+                    if (remaining >= 1000000) {
+                        const millions = Math.floor(remaining / 1000000);
+                        result += convertBelow1000(millions) + ' million' + (millions > 1 ? 's' : '') + ' ';
+                        remaining %= 1000000;
+                    }
+                    
+                    // Milliers
+                    if (remaining >= 1000) {
+                        const thousands = Math.floor(remaining / 1000);
+                        if (thousands === 1) {
+                            result += 'mille ';
+                        } else {
+                            result += convertBelow1000(thousands) + ' mille ';
+                        }
+                        remaining %= 1000;
+                    }
+                    
+                    // Reste (centaines, dizaines, unités)
+                    if (remaining > 0) {
+                        result += convertBelow1000(remaining);
+                    }
+                    
+                    return result.trim() + ' Francs CFA';
+                }
+
+                // CORRECTION : Fonction améliorée pour générer le QR Code
+                function generateQRCode(data) {
+                    const qrContainer = document.getElementById('qrcode');
+                    qrContainer.innerHTML = '';
+                    
+                    try {
+                        if (typeof QRCode !== 'undefined') {
+                            new QRCode(qrContainer, {
+                                text: data,
+                                width: 128,
+                                height: 128,
+                                colorDark: "#000000",
+                                colorLight: "#ffffff",
+                                correctLevel: QRCode.CorrectLevel.H
+                            });
+                        } else {
+                            throw new Error('Bibliothèque QRCode non chargée');
+                        }
+                    } catch (error) {
+                        console.error('Erreur génération QR Code:', error);
+                        qrContainer.innerHTML = `
+                            <div style="width:128px;height:128px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;border:1px solid #ccc;">
+                                <div style="text-align:center;color:#666;font-size:12px;">
+                                    <i class="fas fa-exclamation-triangle"></i><br>
+                                    QR Code<br>Non disponible
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // CORRECTION : Fonction pour mettre à jour automatiquement le QR Code
+                function updateQRCodeAutomatically() {
+                    if (!currentInvoice) return;
+                    
+                    // Recalculer le total
+                    const total = calculateTotal();
+                    
+                    // Mettre à jour le montant total affiché
+                    document.getElementById('previewTotal').textContent = formatCurrency(total);
+                    
+                    // Mettre à jour le montant total en lettres
+                    document.getElementById('previewTotalLetters').textContent = numberToFrenchWords(total);
+                    
+                    // Générer le nouveau QR Code
+                    const qrData = `Facture: ${currentInvoice.invoiceNumber}, Code: ${currentInvoice.invoiceCode}, Montant: ${formatCurrency(total)}, Code Paiement: ${currentInvoice.paymentCode}`;
+                    generateQRCode(qrData);
+                    
+                    // Mettre à jour l'objet currentInvoice
+                    currentInvoice.total = total;
+                    
+                    console.log('QR Code mis à jour automatiquement');
+                }
+                
+                // Fonction pour calculer le total
+                function calculateTotal() {
+                    let total = 0;
+                    document.querySelectorAll('.item-row').forEach(row => {
+                        const quantity = parseFloat(row.querySelector('.item-quantity').value) || 0;
+                        const price = parseFloat(row.querySelector('.item-price').value) || 0;
+                        total += quantity * price;
+                    });
+                    return total;
+                }
+                
+                // Initialiser le système de sauvegarde automatique
+                function initAutoSave() {
+                    autoSaveInterval = setInterval(() => {
+                        performBackup(false);
+                    }, 120000);
+                    
+                    window.addEventListener('beforeunload', function() {
+                        performBackup(false);
+                    });
+                    
+                    performBackup(false);
+                }
+                
+                // Fonction pour effectuer la sauvegarde
+                function performBackup(isManual) {
+                    try {
+                        const backupData = {
+                            invoices: invoices,
+                            timestamp: new Date().getTime(),
+                            version: '1.0'
+                        };
+                        
+                        localStorage.setItem('invoiceBackup', JSON.stringify(backupData));
+                        lastBackupTime = backupData.timestamp;
+                        localStorage.setItem('lastBackupTime', lastBackupTime);
+                        
+                        try {
+                            sessionStorage.setItem('invoiceBackup', JSON.stringify(backupData));
+                        } catch (e) {
+                            console.warn('SessionStorage non disponible pour la sauvegarde');
+                        }
+                        
+                        const backupCount = parseInt(localStorage.getItem('backupCount') || '0');
+                        if (!isManual && backupCount % 10 === 0) {
+                            downloadBackupFile(backupData);
+                        }
+                        
+                        localStorage.setItem('backupCount', (backupCount + 1).toString());
+                        
+                        showSaveNotification('Sauvegarde automatique réussie', false);
+                        
+                        console.log('Sauvegarde effectuée:', new Date().toLocaleString());
+                        
+                    } catch (error) {
+                        console.error('Erreur lors de la sauvegarde:', error);
+                        showSaveNotification('Erreur lors de la sauvegarde', true);
+                    }
+                }
+                
+                // Fonction pour télécharger un fichier de sauvegarde
+                function downloadBackupFile(backupData) {
+                    const dataStr = JSON.stringify(backupData, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = `sauvegarde_factures_${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.style.display = 'none';
+                    document.body.appendChild(linkElement);
+                    linkElement.click();
+                    document.body.removeChild(linkElement);
+                }
+                
+                // Fonction pour afficher la notification de sauvegarde
+                function showSaveNotification(message, isError) {
+                    const notification = document.getElementById('saveNotification');
+                    const messageElement = document.getElementById('saveMessage');
+                    
+                    messageElement.textContent = message;
+                    notification.className = 'save-notification';
+                    
+                    if (isError) {
+                        notification.classList.add('error');
+                        notification.querySelector('i').className = 'fas fa-exclamation-triangle';
+                    } else {
+                        notification.querySelector('i').className = 'fas fa-check-circle';
+                    }
+                    
+                    notification.classList.add('show');
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                    }, 3000);
+                }
+                
+                // Fonction pour afficher le statut de sauvegarde
+                function showBackupStatus() {
+                    const backupTime = new Date(parseInt(lastBackupTime));
+                    const now = new Date();
+                    const diffMinutes = Math.floor((now - backupTime) / (1000 * 60));
+                    
+                    let statusMessage;
+                    if (diffMinutes < 2) {
+                        statusMessage = `Sauvegarde à jour (il y a ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''})`;
+                    } else if (diffMinutes < 10) {
+                        statusMessage = `Sauvegarde récente (il y a ${diffMinutes} minutes)`;
+                    } else {
+                        statusMessage = `Sauvegarde ancienne (il y a ${diffMinutes} minutes)`;
+                    }
+                    
+                    alert(`Statut de sauvegarde:\n${statusMessage}\n\nProchaine sauvegarde automatique dans ${2 - (diffMinutes % 2)} minute${2 - (diffMinutes % 2) > 1 ? 's' : ''}`);
+                }
+                
+                // Restauration depuis la sauvegarde en cas de problème
+                function restoreFromBackup() {
+                    try {
+                        const backup = localStorage.getItem('invoiceBackup');
+                        if (backup) {
+                            const backupData = JSON.parse(backup);
+                            invoices = backupData.invoices || [];
+                            localStorage.setItem('invoices', JSON.stringify(invoices));
+                            console.log('Restauration depuis sauvegarde effectuée');
+                        }
+                    } catch (error) {
+                        console.error('Erreur lors de la restauration:', error);
+                    }
+                }
+                
+                // Vérifier et restaurer si nécessaire au démarrage
+                if (invoices.length === 0) {
+                    restoreFromBackup();
+                }
+
                 // Gestion des onglets
                 document.querySelectorAll('.tab').forEach(tab => {
                     tab.addEventListener('click', function() {
@@ -1259,10 +1657,18 @@
                         } else if (this.getAttribute('data-tab') === 'sales') {
                             updateCharts();
                         } else if (this.getAttribute('data-tab') === 'verify') {
-                            // Arrêter le scanner si on quitte l'onglet
                             stopScanner();
                         }
                     });
+                });
+                
+                // CORRECTION : Réinitialiser avec nouvelle facture
+                document.getElementById('resetInvoice').addEventListener('click', function() {
+                    initializeNewInvoice();
+                });
+                
+                document.getElementById('resetFromPreview').addEventListener('click', function() {
+                    initializeNewInvoice();
                 });
                 
                 // Gestion de la méthode de vérification
@@ -1320,7 +1726,6 @@
                     const stopButton = document.getElementById('stopScanner');
                     const overlay = document.getElementById('scannerOverlay');
                     
-                    // Demander l'accès à la caméra
                     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
                         .then(function(stream) {
                             scannerStream = stream;
@@ -1329,7 +1734,6 @@
                             stopButton.style.display = 'inline-flex';
                             overlay.style.display = 'none';
                             
-                            // Démarrer la détection de QR Code
                             scanQRCodeFromVideo(video);
                         })
                         .catch(function(err) {
@@ -1371,7 +1775,6 @@
                             const code = jsQR(imageData.data, imageData.width, imageData.height);
                             
                             if (code) {
-                                // QR Code détecté
                                 processQRCodeData(code.data);
                                 stopScanner();
                             }
@@ -1404,18 +1807,33 @@
                     }
                 }
                 
-                // Fonction pour traiter les données du QR Code
+                // CORRECTION : Fonction améliorée pour traiter les données du QR Code
                 function processQRCodeData(data) {
                     try {
-                        // Le QR Code contient les données de la facture
-                        // Format: "Facture: [numéro], Code: [code], Montant: [montant], Code Paiement: [code_paiement]"
-                        const parts = data.split(', ');
-                        const invoiceNumber = parts[0].replace('Facture: ', '');
-                        const invoiceCode = parts[1].replace('Code: ', '');
-                        const amount = parts[2].replace('Montant: ', '');
-                        const paymentCode = parts[3].replace('Code Paiement: ', '');
+                        // Format attendu: "Facture: NUM, Code: CODE, Montant: MONTANT, Code Paiement: PAYMENT"
+                        const invoiceMatch = data.match(/Facture:\s*([^,]+),\s*Code:\s*([^,]+),\s*Montant:\s*([^,]+),\s*Code Paiement:\s*(.+)/);
                         
-                        verifyInvoice(invoiceCode, paymentCode);
+                        if (invoiceMatch) {
+                            const invoiceNumber = invoiceMatch[1].trim();
+                            const invoiceCode = invoiceMatch[2].trim();
+                            const amount = invoiceMatch[3].trim();
+                            const paymentCode = invoiceMatch[4].trim();
+                            
+                            verifyInvoice(invoiceCode, paymentCode);
+                        } else {
+                            // Essayer un autre format
+                            const parts = data.split(',');
+                            if (parts.length >= 4) {
+                                const invoiceNumber = parts[0].replace('Facture:', '').trim();
+                                const invoiceCode = parts[1].replace('Code:', '').trim();
+                                const amount = parts[2].replace('Montant:', '').trim();
+                                const paymentCode = parts[3].replace('Code Paiement:', '').trim();
+                                
+                                verifyInvoice(invoiceCode, paymentCode);
+                            } else {
+                                throw new Error('Format de QR Code non reconnu');
+                            }
+                        }
                     } catch (error) {
                         console.error('Erreur lors du traitement du QR Code:', error);
                         showVerificationResult(false, 'Format de QR Code invalide.');
@@ -1424,17 +1842,13 @@
                 
                 // Fonction pour vérifier l'authenticité d'une facture
                 function verifyInvoice(invoiceCode, paymentCode) {
-                    // Rechercher la facture dans le stockage local
-                    const invoices = JSON.parse(localStorage.getItem('invoices')) || [];
                     const invoice = invoices.find(inv => 
                         inv.invoiceCode === invoiceCode && inv.paymentCode === paymentCode
                     );
                     
                     if (invoice) {
-                        // Facture authentique trouvée
                         showVerificationResult(true, 'Cette facture est authentique.', invoice);
                     } else {
-                        // Facture non trouvée ou codes incorrects
                         showVerificationResult(false, 'Cette facture n\'a pas été trouvée dans notre système ou les codes sont incorrects.');
                     }
                 }
@@ -1446,17 +1860,14 @@
                     const resultMessage = document.getElementById('resultMessage');
                     const detailsDiv = document.getElementById('invoiceDetailsVerification');
                     
-                    // Réinitialiser l'affichage
                     resultDiv.className = 'verification-result';
                     detailsDiv.style.display = 'none';
                     
                     if (isValid) {
-                        // Facture valide
                         resultDiv.classList.add('valid');
                         resultTitle.innerHTML = '<i class="fas fa-check-circle"></i> Facture Authentique';
                         resultMessage.textContent = message;
                         
-                        // Afficher les détails de la facture
                         if (invoice) {
                             document.getElementById('verifiedInvoiceNumber').textContent = invoice.invoiceNumber;
                             document.getElementById('verifiedClientName').textContent = invoice.clientName;
@@ -1466,191 +1877,13 @@
                             detailsDiv.style.display = 'block';
                         }
                     } else {
-                        // Facture invalide
                         resultDiv.classList.add('invalid');
                         resultTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Facture Non Valide';
                         resultMessage.textContent = message;
                     }
                     
                     resultDiv.style.display = 'block';
-                    
-                    // Faire défiler jusqu'au résultat
                     resultDiv.scrollIntoView({ behavior: 'smooth' });
-                }
-                
-                // NOUVEAU: Bouton de réinitialisation
-                document.getElementById('resetInvoice').addEventListener('click', resetInvoiceForm);
-                document.getElementById('resetFromPreview').addEventListener('click', resetInvoiceForm);
-                
-                // Fonction pour réinitialiser le formulaire de facture
-                function resetInvoiceForm() {
-                    document.getElementById('invoiceForm').reset();
-                    document.getElementById('invoicePreview').style.display = 'none';
-                    
-                    // Réinitialiser les articles (garder seulement le premier)
-                    const itemsContainer = document.getElementById('itemsContainer');
-                    while (itemsContainer.children.length > 1) {
-                        itemsContainer.removeChild(itemsContainer.lastChild);
-                    }
-                    
-                    // Réinitialiser le premier article
-                    const firstItemRow = itemsContainer.querySelector('.item-row');
-                    firstItemRow.querySelector('.item-type').value = '';
-                    firstItemRow.querySelector('.item-description').value = '';
-                    firstItemRow.querySelector('.item-quantity').value = '1';
-                    firstItemRow.querySelector('.item-price').value = '';
-                    firstItemRow.querySelector('.item-total').value = '';
-                    
-                    currentInvoice = null;
-                    
-                    // Faire défiler vers le haut du formulaire
-                    document.getElementById('invoiceForm').scrollIntoView({ behavior: 'smooth' });
-                }
-                
-                // NOUVEAU: Bouton d'exportation d'une facture
-                document.getElementById('exportInvoice').addEventListener('click', function() {
-                    if (!currentInvoice) {
-                        alert('Veuillez d\'abord générer une facture.');
-                        return;
-                    }
-                    
-                    exportInvoice(currentInvoice);
-                });
-                
-                // NOUVEAU: Bouton d'exportation de toutes les factures
-                document.getElementById('exportAllInvoices').addEventListener('click', function() {
-                    if (invoices.length === 0) {
-                        alert('Aucune facture à exporter.');
-                        return;
-                    }
-                    
-                    exportAllInvoices();
-                });
-                
-                // NOUVEAU: Bouton d'importation de factures
-                document.getElementById('importInvoices').addEventListener('click', function() {
-                    document.getElementById('importFile').click();
-                });
-                
-                document.getElementById('importFile').addEventListener('change', function(e) {
-                    if (e.target.files && e.target.files.length > 0) {
-                        const file = e.target.files[0];
-                        const reader = new FileReader();
-                        
-                        reader.onload = function(event) {
-                            try {
-                                const importedInvoices = JSON.parse(event.target.result);
-                                importInvoices(importedInvoices);
-                            } catch (error) {
-                                alert('Erreur lors de l\'importation: le fichier n\'est pas un JSON valide.');
-                                console.error(error);
-                            }
-                        };
-                        
-                        reader.readAsText(file);
-                    }
-                });
-                
-                // Fonction pour exporter une facture en JSON
-                function exportInvoice(invoice) {
-                    const dataStr = JSON.stringify(invoice, null, 2);
-                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                    
-                    const exportFileDefaultName = `facture_${invoice.invoiceNumber}.json`;
-                    
-                    const linkElement = document.createElement('a');
-                    linkElement.setAttribute('href', dataUri);
-                    linkElement.setAttribute('download', exportFileDefaultName);
-                    linkElement.click();
-                }
-                
-                // Fonction pour exporter toutes les factures en JSON
-                function exportAllInvoices() {
-                    const dataStr = JSON.stringify(invoices, null, 2);
-                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-                    
-                    const exportFileDefaultName = `factures_${new Date().toISOString().split('T')[0]}.json`;
-                    
-                    const linkElement = document.createElement('a');
-                    linkElement.setAttribute('href', dataUri);
-                    linkElement.setAttribute('download', exportFileDefaultName);
-                    linkElement.click();
-                }
-                
-                // Fonction pour importer des factures
-                function importInvoices(importedInvoices) {
-                    if (!Array.isArray(importedInvoices)) {
-                        alert('Format de fichier invalide. Le fichier doit contenir un tableau de factures.');
-                        return;
-                    }
-                    
-                    // Vérifier que chaque facture a les champs requis
-                    const validInvoices = importedInvoices.filter(invoice => {
-                        return invoice.date && invoice.invoiceNumber && invoice.clientName && invoice.total;
-                    });
-                    
-                    if (validInvoices.length === 0) {
-                        alert('Aucune facture valide trouvée dans le fichier.');
-                        return;
-                    }
-                    
-                    // Ajouter les factures importées à la liste existante
-                    const existingInvoiceNumbers = invoices.map(inv => inv.invoiceNumber);
-                    let newInvoicesCount = 0;
-                    
-                    validInvoices.forEach(invoice => {
-                        // Générer un nouveau timestamp si manquant
-                        if (!invoice.timestamp) {
-                            invoice.timestamp = new Date().getTime();
-                        }
-                        
-                        // Vérifier si la facture existe déjà
-                        if (!existingInvoiceNumbers.includes(invoice.invoiceNumber)) {
-                            invoices.push(invoice);
-                            newInvoicesCount++;
-                        }
-                    });
-                    
-                    // Sauvegarder dans le stockage local
-                    localStorage.setItem('invoices', JSON.stringify(invoices));
-                    
-                    // Mettre à jour l'affichage
-                    if (document.getElementById('history-tab').classList.contains('active')) {
-                        loadInvoices();
-                        updateStats();
-                    }
-                    
-                    alert(`${newInvoicesCount} nouvelle(s) facture(s) importée(s) avec succès.`);
-                    
-                    // Réinitialiser le champ de fichier
-                    document.getElementById('importFile').value = '';
-                }
-                
-                // Le reste du code JavaScript pour les autres fonctionnalités reste inchangé
-                // ... (code précédent pour la génération de factures, historique, etc.)
-                
-                // Générer automatiquement le code de facture
-                function generateInvoiceCode() {
-                    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                    const numbers = '0123456789';
-                    const symbols = '#@$%&*!';
-                    
-                    let code = '';
-                    
-                    // 3 lettres aléatoires
-                    for (let i = 0; i < 3; i++) {
-                        code += letters.charAt(Math.floor(Math.random() * letters.length));
-                    }
-                    
-                    // 3 chiffres aléatoires
-                    for (let i = 0; i < 3; i++) {
-                        code += numbers.charAt(Math.floor(Math.random() * numbers.length));
-                    }
-                    
-                    // 1 symbole aléatoire
-                    code += symbols.charAt(Math.floor(Math.random() * symbols.length));
-                    
-                    return code;
                 }
                 
                 // Ajouter un nouvel article
@@ -1693,11 +1926,10 @@
                     `;
                     itemsContainer.appendChild(newItemRow);
                     
-                    // Ajouter les écouteurs d'événements pour le nouveau champ
                     addItemEventListeners(newItemRow);
                 });
                 
-                // Ajouter les écouteurs d'événements pour les champs d'article
+                // CORRECTION : Ajouter les écouteurs d'événements pour les champs d'article avec mise à jour automatique
                 function addItemEventListeners(itemRow) {
                     const quantityInput = itemRow.querySelector('.item-quantity');
                     const priceInput = itemRow.querySelector('.item-price');
@@ -1708,14 +1940,34 @@
                         const price = parseFloat(priceInput.value) || 0;
                         const total = quantity * price;
                         totalInput.value = formatCurrency(total);
+                        
+                        // CORRECTION : Mettre à jour automatiquement le QR Code et le montant en lettres
+                        if (currentInvoice && document.getElementById('invoicePreview').style.display !== 'none') {
+                            updateQRCodeAutomatically();
+                        }
                     }
                     
+                    // CORRECTION : Ajouter des écouteurs pour tous les événements de modification
                     quantityInput.addEventListener('input', updateItemTotal);
+                    quantityInput.addEventListener('change', updateItemTotal);
                     priceInput.addEventListener('input', updateItemTotal);
+                    priceInput.addEventListener('change', updateItemTotal);
                     
-                    // Initialiser le total
                     updateItemTotal();
                 }
+                
+                // CORRECTION : Ajouter des écouteurs pour les champs de base de la facture
+                document.getElementById('clientName').addEventListener('input', function() {
+                    if (currentInvoice && document.getElementById('invoicePreview').style.display !== 'none') {
+                        updateQRCodeAutomatically();
+                    }
+                });
+                
+                document.getElementById('invoiceNumber').addEventListener('input', function() {
+                    if (currentInvoice && document.getElementById('invoicePreview').style.display !== 'none') {
+                        updateQRCodeAutomatically();
+                    }
+                });
                 
                 // Initialiser les écouteurs pour le premier article
                 const firstItemRow = document.querySelector('.item-row');
@@ -1725,7 +1977,6 @@
                 document.getElementById('generateInvoice').addEventListener('click', generateInvoice);
                 
                 function generateInvoice() {
-                    // Récupérer les données du formulaire
                     const date = document.getElementById('date').value;
                     const companyName = document.getElementById('companyName').value;
                     const companyAddress = document.getElementById('companyAddress').value;
@@ -1733,13 +1984,11 @@
                     const ownerName = document.getElementById('ownerName').value;
                     const invoiceNumber = document.getElementById('invoiceNumber').value;
                     
-                    // Vérifier que tous les champs obligatoires sont remplis
                     if (!date || !companyName || !companyAddress || !clientName || !ownerName || !invoiceNumber) {
                         alert('Veuillez remplir tous les champs obligatoires.');
                         return;
                     }
                     
-                    // Récupérer les articles
                     const items = [];
                     let isValid = true;
                     document.querySelectorAll('.item-row').forEach(row => {
@@ -1768,11 +2017,9 @@
                         return;
                     }
                     
-                    // Calculer le total
                     const total = items.reduce((sum, item) => sum + item.total, 0);
-                    
-                    // Générer le code de facture
                     const invoiceCode = generateInvoiceCode();
+                    const paymentCode = generatePaymentCode();
                     
                     // Mettre à jour l'aperçu
                     document.getElementById('previewDate').textContent = formatDate(date);
@@ -1784,7 +2031,6 @@
                     document.getElementById('previewInvoiceNumber').textContent = `N° ${invoiceNumber}`;
                     document.getElementById('previewInvoiceCode').textContent = `Code: ${invoiceCode}`;
                     
-                    // Mettre à jour les articles dans l'aperçu
                     const previewItems = document.getElementById('previewItems');
                     previewItems.innerHTML = '';
                     items.forEach(item => {
@@ -1799,14 +2045,16 @@
                         previewItems.appendChild(row);
                     });
                     
-                    // Mettre à jour le total
                     document.getElementById('previewTotal').textContent = formatCurrency(total);
-                    document.getElementById('previewTotalLetters').textContent = numberToFrenchWords(total) + ' Francs CFA';
                     
-                    // Générer le code de paiement et QR Code
-                    generateSecurityFeatures(invoiceNumber, total, invoiceCode);
+                    // CORRECTION : Utilisation de la fonction améliorée pour la conversion en lettres
+                    document.getElementById('previewTotalLetters').textContent = numberToFrenchWords(total);
                     
-                    // Stocker la facture courante
+                    // Génération du QR Code
+                    document.getElementById('paymentCode').textContent = paymentCode;
+                    const qrData = `Facture: ${invoiceNumber}, Code: ${invoiceCode}, Montant: ${formatCurrency(total)}, Code Paiement: ${paymentCode}`;
+                    generateQRCode(qrData);
+                    
                     currentInvoice = {
                         date: date,
                         invoiceNumber: invoiceNumber,
@@ -1817,14 +2065,11 @@
                         items: items,
                         total: total,
                         invoiceCode: invoiceCode,
-                        paymentCode: generatePaymentCode(invoiceNumber, total, invoiceCode),
+                        paymentCode: paymentCode,
                         timestamp: new Date().getTime()
                     };
                     
-                    // Afficher l'aperçu
                     document.getElementById('invoicePreview').style.display = 'block';
-                    
-                    // Faire défiler jusqu'à l'aperçu
                     document.getElementById('invoicePreview').scrollIntoView({ behavior: 'smooth' });
                 }
                 
@@ -1833,7 +2078,6 @@
                     const { jsPDF } = window.jspdf;
                     const invoiceElement = document.getElementById('invoiceContainer');
                     
-                    // Récupérer le format sélectionné
                     const pdfFormat = document.querySelector('input[name="pdfFormat"]:checked').value;
                     const format = pdfFormat === 'A4' ? 'a4' : 'a5';
                     const orientation = 'portrait';
@@ -1850,8 +2094,8 @@
                             format: format
                         });
                         
-                        const imgWidth = pdfFormat === 'A4' ? 190 : 140; // Largeur selon le format
-                        const pageHeight = pdfFormat === 'A4' ? 277 : 200; // Hauteur selon le format
+                        const imgWidth = pdfFormat === 'A4' ? 190 : 140;
+                        const pageHeight = pdfFormat === 'A4' ? 277 : 200;
                         const imgHeight = canvas.height * imgWidth / canvas.width;
                         let heightLeft = imgHeight;
                         
@@ -1897,7 +2141,6 @@
                         return;
                     }
                     
-                    // Vérifier si la facture existe déjà
                     const existingIndex = invoices.findIndex(inv => inv.invoiceNumber === currentInvoice.invoiceNumber);
                     
                     if (existingIndex !== -1) {
@@ -1909,7 +2152,6 @@
                     localStorage.setItem('invoices', JSON.stringify(invoices));
                     alert('Facture sauvegardée avec succès!');
                     
-                    // Recharger l'historique si on est sur l'onglet historique
                     if (document.getElementById('history-tab').classList.contains('active')) {
                         loadInvoices();
                         updateStats();
@@ -1942,24 +2184,20 @@
                     
                     let filteredInvoices = invoices;
                     
-                    // Filtrer par date
                     if (filterDate) {
                         filteredInvoices = filteredInvoices.filter(inv => inv.date === filterDate);
                     }
                     
-                    // Filtrer par mois
                     if (filterMonth) {
                         filteredInvoices = filteredInvoices.filter(inv => inv.date.startsWith(filterMonth));
                     }
                     
-                    // Filtrer par article
                     if (filterArticle) {
                         filteredInvoices = filteredInvoices.filter(inv => 
                             inv.items.some(item => item.type === filterArticle)
                         );
                     }
                     
-                    // Trier par date (plus récent en premier)
                     filteredInvoices.sort((a, b) => new Date(b.date) - new Date(a.date));
                     
                     const invoicesList = document.getElementById('invoicesList');
@@ -1985,14 +2223,12 @@
                             <td>
                                 <button class="view-invoice" data-id="${invoice.timestamp}"><i class="fas fa-eye"></i> Voir</button>
                                 <button class="delete-invoice" data-id="${invoice.timestamp}"><i class="fas fa-trash"></i> Supprimer</button>
-                                <button class="export-invoice" data-id="${invoice.timestamp}"><i class="fas fa-file-export"></i> Exporter</button>
                             </td>
                         `;
                         
                         invoicesList.appendChild(row);
                     });
                     
-                    // Ajouter les écouteurs d'événements pour les boutons
                     document.querySelectorAll('.view-invoice').forEach(button => {
                         button.addEventListener('click', function() {
                             const invoiceId = this.getAttribute('data-id');
@@ -2006,16 +2242,6 @@
                             deleteInvoice(invoiceId);
                         });
                     });
-                    
-                    document.querySelectorAll('.export-invoice').forEach(button => {
-                        button.addEventListener('click', function() {
-                            const invoiceId = this.getAttribute('data-id');
-                            const invoice = invoices.find(inv => inv.timestamp == invoiceId);
-                            if (invoice) {
-                                exportInvoice(invoice);
-                            }
-                        });
-                    });
                 }
                 
                 // Mettre à jour les statistiques
@@ -2026,38 +2252,32 @@
                     
                     let filteredInvoices = invoices;
                     
-                    // Filtrer par date
                     if (filterDate) {
                         filteredInvoices = filteredInvoices.filter(inv => inv.date === filterDate);
                     }
                     
-                    // Filtrer par mois
                     if (filterMonth) {
                         filteredInvoices = filteredInvoices.filter(inv => inv.date.startsWith(filterMonth));
                     }
                     
-                    // Filtrer par article
                     if (filterArticle) {
                         filteredInvoices = filteredInvoices.filter(inv => 
                             inv.items.some(item => item.type === filterArticle)
                         );
                     }
                     
-                    // Calculer le total du jour
                     const today = new Date().toISOString().split('T')[0];
                     const dailyInvoices = invoices.filter(inv => inv.date === today);
                     const dailyTotal = dailyInvoices.reduce((sum, inv) => sum + inv.total, 0);
                     document.getElementById('dailyTotal').textContent = formatCurrency(dailyTotal);
                     document.getElementById('dailyCount').textContent = `${dailyInvoices.length} facture(s)`;
                     
-                    // Calculer le total du mois
                     const currentMonth = new Date().toISOString().substring(0, 7);
                     const monthlyInvoices = invoices.filter(inv => inv.date.startsWith(currentMonth));
                     const monthlyTotal = monthlyInvoices.reduce((sum, inv) => sum + inv.total, 0);
                     document.getElementById('monthlyTotal').textContent = formatCurrency(monthlyTotal);
                     document.getElementById('monthlyCount').textContent = `${monthlyInvoices.length} facture(s)`;
                     
-                    // Calculer le total par article
                     let articleTotal = 0;
                     let articleCount = 0;
                     
@@ -2071,7 +2291,6 @@
                             });
                         });
                     } else {
-                        // Si aucun filtre d'article, afficher le total de toutes les factures filtrées
                         articleTotal = filteredInvoices.reduce((sum, inv) => sum + inv.total, 0);
                         articleCount = filteredInvoices.length;
                     }
@@ -2085,7 +2304,6 @@
                     const invoice = invoices.find(inv => inv.timestamp == invoiceId);
                     if (!invoice) return;
                     
-                    // Remplir le formulaire avec les données de la facture
                     document.getElementById('date').value = invoice.date;
                     document.getElementById('companyName').value = invoice.companyName;
                     document.getElementById('companyAddress').value = invoice.companyAddress;
@@ -2093,11 +2311,9 @@
                     document.getElementById('ownerName').value = invoice.ownerName;
                     document.getElementById('invoiceNumber').value = invoice.invoiceNumber;
                     
-                    // Vider les articles actuels
                     const itemsContainer = document.getElementById('itemsContainer');
                     itemsContainer.innerHTML = '';
                     
-                    // Ajouter les articles de la facture
                     invoice.items.forEach((item, index) => {
                         const newItemRow = document.createElement('div');
                         newItemRow.className = 'item-row form-row';
@@ -2135,18 +2351,15 @@
                         `;
                         itemsContainer.appendChild(newItemRow);
                         
-                        // Ajouter les écouteurs d'événements
                         addItemEventListeners(newItemRow);
                     });
                     
-                    // Basculer vers l'onglet de création
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
                     
                     document.querySelector('.tab[data-tab="create"]').classList.add('active');
                     document.getElementById('create-tab').classList.add('active');
                     
-                    // Générer la facture
                     generateInvoice();
                 }
                 
@@ -2167,28 +2380,24 @@
                     
                     let filteredInvoices = invoices;
                     
-                    // Filtrer par mois
                     if (analysisMonth) {
                         filteredInvoices = filteredInvoices.filter(inv => inv.date.startsWith(analysisMonth));
                     }
                     
-                    // Agrégation des données par article
                     const articleData = {};
                     const articleQuantities = {};
                     const monthlyData = {};
                     
                     filteredInvoices.forEach(invoice => {
-                        // Agrégation par mois pour le graphique d'évolution
-                        const month = invoice.date.substring(0, 7); // Format YYYY-MM
+                        const month = invoice.date.substring(0, 7);
                         if (!monthlyData[month]) {
                             monthlyData[month] = 0;
                         }
                         monthlyData[month] += invoice.total;
                         
-                        // Agrégation par article
                         invoice.items.forEach(item => {
                             if (analysisArticle && item.type !== analysisArticle) {
-                                return; // Ignorer si un article spécifique est sélectionné et ne correspond pas
+                                return;
                             }
                             
                             if (!articleData[item.type]) {
@@ -2201,7 +2410,6 @@
                         });
                     });
                     
-                    // Préparer les données pour les graphiques
                     const articleLabels = Object.keys(articleData);
                     const articleValues = Object.values(articleData);
                     const articleQuantityValues = Object.values(articleQuantities);
@@ -2209,14 +2417,12 @@
                     const monthLabels = Object.keys(monthlyData).sort();
                     const monthValues = monthLabels.map(month => monthlyData[month]);
                     
-                    // Couleurs pour les graphiques
                     const colors = [
                         '#4CAF50', '#2196F3', '#FF9800', '#E91E63', 
                         '#9C27B0', '#00BCD4', '#FF5722', '#795548',
                         '#607D8B', '#3F51B5'
                     ];
                     
-                    // Détruire les graphiques existants s'ils existent
                     if (salesChart) salesChart.destroy();
                     if (quantityChart) quantityChart.destroy();
                     if (monthlyChart) monthlyChart.destroy();
@@ -2372,7 +2578,6 @@
                 }
                 
                 function formatCurrency(amount) {
-                    // Formater en Franc CFA (séparateur de milliers)
                     return new Intl.NumberFormat('fr-FR', {
                         minimumFractionDigits: 0,
                         maximumFractionDigits: 0
@@ -2393,93 +2598,157 @@
                     return types[type] || type;
                 }
                 
-                function generateSecurityFeatures(invoiceNumber, total, invoiceCode) {
-                    // Générer un code de paiement unique
-                    const paymentCode = generatePaymentCode(invoiceNumber, total, invoiceCode);
-                    document.getElementById('paymentCode').textContent = paymentCode;
+                function generateInvoiceCode() {
+                    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    const numbers = '0123456789';
+                    const symbols = '#@$%&*!';
                     
-                    // Générer le QR Code
-                    const qrData = `Facture: ${invoiceNumber}, Code: ${invoiceCode}, Montant: ${formatCurrency(total)}, Code Paiement: ${paymentCode}`;
-                    document.getElementById('qrcode').innerHTML = '';
-                    new QRCode(document.getElementById('qrcode'), {
-                        text: qrData,
-                        width: 128,
-                        height: 128,
-                        colorDark: "#000000",
-                        colorLight: "#ffffff",
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                }
-                
-                function generatePaymentCode(invoiceNumber, total, invoiceCode) {
-                    // Générer un code basé sur le numéro de facture, le montant et le code de facture
-                    const baseCode = invoiceNumber.replace(/\D/g, '') + 
-                                   Math.floor(total).toString() + 
-                                   invoiceCode.replace(/\W/g, '');
+                    let code = '';
                     
-                    // Réduire à 12 caractères si nécessaire et formater
-                    let code = baseCode.substring(0, 12);
-                    if (code.length > 4) {
-                        code = code.match(/.{1,4}/g).join('-');
+                    for (let i = 0; i < 3; i++) {
+                        code += letters.charAt(Math.floor(Math.random() * letters.length));
                     }
+                    
+                    for (let i = 0; i < 3; i++) {
+                        code += numbers.charAt(Math.floor(Math.random() * numbers.length));
+                    }
+                    
+                    code += symbols.charAt(Math.floor(Math.random() * symbols.length));
                     
                     return code;
                 }
                 
-                function numberToFrenchWords(num) {
-                    // Conversion simplifiée du nombre en lettres
-                    const units = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
-                    const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
-                    const tens = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+                function generatePaymentCode() {
+                    const numbers = '0123456789';
+                    let code = '';
                     
-                    if (num === 0) return 'zéro';
-                    
-                    let result = '';
-                    const integerPart = Math.floor(num);
-                    
-                    // Conversion de la partie entière
-                    if (integerPart >= 1000000) {
-                        const millions = Math.floor(integerPart / 1000000);
-                        result += convertHundreds(millions) + ' million ';
-                        num = integerPart % 1000000;
+                    for (let i = 0; i < 12; i++) {
+                        code += numbers.charAt(Math.floor(Math.random() * numbers.length));
                     }
                     
-                    if (integerPart >= 1000) {
-                        const thousands = Math.floor(integerPart / 1000);
-                        if (thousands > 1) {
-                            result += convertHundreds(thousands) + ' mille ';
-                        } else {
-                            result += 'mille ';
-                        }
-                        num = integerPart % 1000;
+                    return code.match(/.{1,4}/g).join('-');
+                }
+                
+                // Initialiser la sauvegarde automatique
+                initAutoSave();
+                
+                // Gestion du bouton de sauvegarde manuelle
+                document.getElementById('manualBackup').addEventListener('click', function() {
+                    performBackup(true);
+                });
+                
+                // Gestion du bouton d'état de sauvegarde
+                document.getElementById('backupButton').addEventListener('click', function() {
+                    showBackupStatus();
+                });
+                
+                // Exportation d'une facture
+                document.getElementById('exportInvoice').addEventListener('click', function() {
+                    if (!currentInvoice) {
+                        alert('Veuillez d\'abord générer une facture.');
+                        return;
                     }
                     
-                    result += convertHundreds(integerPart);
+                    exportInvoice(currentInvoice);
+                });
+                
+                // Exportation de toutes les factures
+                document.getElementById('exportAllInvoices').addEventListener('click', function() {
+                    if (invoices.length === 0) {
+                        alert('Aucune facture à exporter.');
+                        return;
+                    }
                     
-                    return result.charAt(0).toUpperCase() + result.slice(1);
-                    
-                    function convertHundreds(n) {
-                        if (n === 0) return '';
-                        if (n < 10) return units[n];
-                        if (n < 20) return teens[n - 10];
-                        if (n < 100) {
-                            const ten = Math.floor(n / 10);
-                            const unit = n % 10;
-                            if (unit === 0) return tens[ten];
-                            if (ten === 7 || ten === 9) {
-                                return tens[ten] + '-' + teens[unit];
+                    exportAllInvoices();
+                });
+                
+                // Importation de factures
+                document.getElementById('importInvoices').addEventListener('click', function() {
+                    document.getElementById('importFile').click();
+                });
+                
+                document.getElementById('importFile').addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            try {
+                                const importedInvoices = JSON.parse(event.target.result);
+                                importInvoices(importedInvoices);
+                            } catch (error) {
+                                alert('Erreur lors de l\'importation: le fichier n\'est pas un JSON valide.');
+                                console.error(error);
                             }
-                            return tens[ten] + '-' + units[unit];
-                        }
-                        const hundred = Math.floor(n / 100);
-                        const remainder = n % 100;
-                        if (remainder === 0) {
-                            if (hundred === 1) return 'cent';
-                            return units[hundred] + ' cents';
-                        }
-                        if (hundred === 1) return 'cent ' + convertHundreds(remainder);
-                        return units[hundred] + ' cent ' + convertHundreds(remainder);
+                        };
+                        
+                        reader.readAsText(file);
                     }
+                });
+                
+                function exportInvoice(invoice) {
+                    const dataStr = JSON.stringify(invoice, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = `facture_${invoice.invoiceNumber}.json`;
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                }
+                
+                function exportAllInvoices() {
+                    const dataStr = JSON.stringify(invoices, null, 2);
+                    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                    
+                    const exportFileDefaultName = `factures_${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    const linkElement = document.createElement('a');
+                    linkElement.setAttribute('href', dataUri);
+                    linkElement.setAttribute('download', exportFileDefaultName);
+                    linkElement.click();
+                }
+                
+                function importInvoices(importedInvoices) {
+                    if (!Array.isArray(importedInvoices)) {
+                        alert('Format de fichier invalide. Le fichier doit contenir un tableau de factures.');
+                        return;
+                    }
+                    
+                    const validInvoices = importedInvoices.filter(invoice => {
+                        return invoice.date && invoice.invoiceNumber && invoice.clientName && invoice.total;
+                    });
+                    
+                    if (validInvoices.length === 0) {
+                        alert('Aucune facture valide trouvée dans le fichier.');
+                        return;
+                    }
+                    
+                    const existingInvoiceNumbers = invoices.map(inv => inv.invoiceNumber);
+                    let newInvoicesCount = 0;
+                    
+                    validInvoices.forEach(invoice => {
+                        if (!invoice.timestamp) {
+                            invoice.timestamp = new Date().getTime();
+                        }
+                        
+                        if (!existingInvoiceNumbers.includes(invoice.invoiceNumber)) {
+                            invoices.push(invoice);
+                            newInvoicesCount++;
+                        }
+                    });
+                    
+                    localStorage.setItem('invoices', JSON.stringify(invoices));
+                    
+                    if (document.getElementById('history-tab').classList.contains('active')) {
+                        loadInvoices();
+                        updateStats();
+                    }
+                    
+                    alert(`${newInvoicesCount} nouvelle(s) facture(s) importée(s) avec succès.`);
+                    
+                    document.getElementById('importFile').value = '';
                 }
             }
         });
