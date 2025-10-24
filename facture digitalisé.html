@@ -41,12 +41,13 @@
             justify-content: center;
             align-items: center;
             color: var(--dark-text);
+            padding: 10px;
         }
         
         /* Écran de connexion */
         .login-container {
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             width: 100%;
@@ -56,8 +57,8 @@
         
         .login-container h1 {
             color: var(--primary-color);
-            margin-bottom: 30px;
-            font-size: 28px;
+            margin-bottom: 25px;
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -65,13 +66,13 @@
         }
         
         .login-form .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
             text-align: left;
         }
         
         .login-form label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: var(--medium-text);
         }
@@ -126,9 +127,9 @@
             display: none;
             width: 100%;
             max-width: 1200px;
-            margin: 20px auto;
+            margin: 15px auto;
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
         }
@@ -137,15 +138,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
             border-bottom: 2px solid var(--primary-color);
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
         .app-header h1 {
             margin: 0;
             color: var(--dark-text);
-            font-size: 24px;
+            font-size: 22px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -153,14 +156,15 @@
         
         .header-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         
         .logout-button {
             background-color: var(--danger-color);
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 8px 15px;
             border-radius: var(--radius);
             cursor: pointer;
             font-size: 14px;
@@ -168,7 +172,7 @@
             transition: background-color 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .logout-button:hover {
@@ -179,7 +183,7 @@
             background-color: var(--secondary-color);
             color: white;
             border: none;
-            padding: 10px 18px;
+            padding: 8px 15px;
             border-radius: var(--radius);
             cursor: pointer;
             font-size: 14px;
@@ -187,7 +191,7 @@
             transition: background-color 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         .backup-button:hover {
@@ -196,14 +200,15 @@
         
         .tabs {
             display: flex;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
             gap: 5px;
+            overflow-x: auto;
         }
         
         .tab {
-            padding: 12px 24px;
+            padding: 10px 18px;
             cursor: pointer;
             background-color: var(--light-bg);
             border-radius: var(--radius) var(--radius) 0 0;
@@ -212,7 +217,8 @@
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            font-size: 14px;
         }
         
         .tab:hover {
@@ -239,23 +245,24 @@
         }
         
         .form-section, .invoice-preview, .history-section, .sales-analysis-section, .verify-section {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
         
         .form-section h2, .invoice-preview h2, .history-section h2, .sales-analysis-section h2, .verify-section h2 {
             border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 12px;
+            padding-bottom: 10px;
             color: var(--primary-color);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 20px;
         }
         
         .form-row {
             display: flex;
             flex-wrap: wrap;
-            margin-bottom: 20px;
-            gap: 15px;
+            margin-bottom: 15px;
+            gap: 12px;
         }
         
         .form-group {
@@ -264,17 +271,17 @@
         
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             font-weight: 600;
             color: var(--medium-text);
         }
         
         input, select, textarea {
             width: 100%;
-            padding: 12px 15px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: var(--radius);
-            font-size: 16px;
+            font-size: 15px;
             transition: border-color 0.3s, box-shadow 0.3s;
         }
         
@@ -288,16 +295,17 @@
             background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 12px 20px;
+            padding: 10px 16px;
             border-radius: var(--radius);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            margin-right: 10px;
+            margin-right: 8px;
+            margin-bottom: 8px;
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
         
         button:hover {
@@ -356,7 +364,7 @@
         
         .invoice-container {
             border: 2px solid var(--primary-color);
-            padding: 25px;
+            padding: 20px;
             background-color: white;
             position: relative;
             width: 100%;
@@ -369,39 +377,39 @@
         .invoice-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
         }
         
         .company-info {
             flex: 1;
-            min-width: 200px;
+            min-width: 180px;
         }
         
         .invoice-title {
             text-align: center;
             flex: 2;
-            min-width: 300px;
+            min-width: 250px;
         }
         
         .invoice-details {
             flex: 1;
             text-align: right;
-            min-width: 150px;
+            min-width: 130px;
         }
         
         .invoice-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 14px;
+            margin: 15px 0;
+            font-size: 13px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .invoice-table th, .invoice-table td {
             border: 1px solid var(--border-color);
-            padding: 10px;
+            padding: 8px;
             text-align: left;
         }
         
@@ -418,35 +426,35 @@
         .invoice-footer {
             display: flex;
             justify-content: space-between;
-            margin-top: 50px;
+            margin-top: 40px;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 15px;
         }
         
         .signature-section {
             width: 45%;
-            min-width: 200px;
-            margin-bottom: 20px;
+            min-width: 180px;
+            margin-bottom: 15px;
         }
         
         .signature-line {
             border-top: 1px solid #000;
-            margin-top: 60px;
+            margin-top: 50px;
             padding-top: 5px;
         }
         
         .security-section {
-            margin-top: 20px;
+            margin-top: 15px;
             text-align: center;
             border-top: 1px dashed #ccc;
-            padding-top: 15px;
+            padding-top: 12px;
         }
         
         #qrcode {
             display: inline-block;
-            margin: 10px auto;
-            width: 128px;
-            height: 128px;
+            margin: 8px auto;
+            width: 120px;
+            height: 120px;
         }
         
         #qrcode canvas, #qrcode img {
@@ -456,73 +464,73 @@
         
         .payment-code {
             font-family: monospace;
-            font-size: 18px;
-            letter-spacing: 3px;
+            font-size: 16px;
+            letter-spacing: 2px;
             background-color: #f0f0f0;
-            padding: 8px 15px;
+            padding: 6px 12px;
             display: inline-block;
-            margin: 10px 0;
+            margin: 8px 0;
             border-radius: var(--radius);
             border: 1px dashed #ccc;
         }
         
         .invoice-code {
             font-family: monospace;
-            font-size: 16px;
+            font-size: 14px;
             background-color: #e9f7ef;
-            padding: 8px 15px;
+            padding: 6px 12px;
             border-radius: var(--radius);
             display: inline-block;
-            margin: 5px 0;
+            margin: 4px 0;
             font-weight: 600;
         }
         
         .actions {
             text-align: center;
-            margin-top: 25px;
+            margin-top: 20px;
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
         }
         
         .pdf-format-selector {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
         }
         
         .pdf-format-selector label {
             display: inline-flex;
             align-items: center;
-            margin-right: 20px;
+            margin-right: 15px;
             cursor: pointer;
-            gap: 5px;
+            gap: 4px;
         }
         
         .filter-section {
             background-color: var(--light-bg);
-            padding: 20px;
+            padding: 15px;
             border-radius: var(--radius);
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         
         .filter-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
         
         .stat-card {
             background-color: white;
-            padding: 20px;
+            padding: 15px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             border-left: 4px solid var(--primary-color);
@@ -534,23 +542,23 @@
         }
         
         .stat-value {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
             color: var(--primary-color);
-            margin: 10px 0;
+            margin: 8px 0;
         }
         
         .history-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 15px;
+            font-size: 13px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .history-table th, .history-table td {
             border: 1px solid var(--border-color);
-            padding: 12px;
+            padding: 10px;
             text-align: left;
         }
         
@@ -566,16 +574,16 @@
         /* Analyse des ventes */
         .charts-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 25px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
         }
         
         .chart-card {
             background-color: white;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 20px;
+            padding: 15px;
             transition: transform 0.3s;
         }
         
@@ -587,23 +595,24 @@
             margin-top: 0;
             color: var(--dark-text);
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 12px;
+            padding-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            font-size: 16px;
         }
         
         .chart-container {
             position: relative;
-            height: 300px;
+            height: 280px;
             width: 100%;
         }
         
         .analysis-controls {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 15px;
             align-items: center;
         }
         
@@ -617,7 +626,7 @@
             background-color: white;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
-            padding: 25px;
+            padding: 20px;
             max-width: 800px;
             margin: 0 auto;
         }
@@ -626,7 +635,7 @@
             position: relative;
             width: 100%;
             max-width: 500px;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
         }
         
         #scanner {
@@ -657,8 +666,8 @@
         }
         
         .verification-result {
-            margin-top: 20px;
-            padding: 20px;
+            margin-top: 15px;
+            padding: 15px;
             border-radius: var(--radius);
             text-align: center;
             display: none;
@@ -681,33 +690,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
         
         .invoice-details-verification {
-            margin-top: 20px;
+            margin-top: 15px;
             text-align: left;
             background-color: var(--light-bg);
-            padding: 15px;
+            padding: 12px;
             border-radius: var(--radius);
         }
         
         /* Notifications de sauvegarde */
         .save-notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background-color: var(--success-color);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 16px;
             border-radius: var(--radius);
             box-shadow: var(--shadow);
             z-index: 1000;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transform: translateX(150%);
             transition: transform 0.3s ease;
+            max-width: 300px;
         }
         
         .save-notification.show {
@@ -736,19 +746,53 @@
             }
         }
         
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
+        /* Tablettes (écrans moyens) */
+        @media (max-width: 1024px) {
             .app-container {
                 padding: 15px;
                 margin: 10px auto;
             }
             
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .invoice-container {
+                padding: 15px;
+            }
+            
+            .invoice-header, .invoice-footer {
+                flex-direction: column;
+            }
+            
+            .signature-section {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+        
+        /* Tablettes petites et grands mobiles */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .login-container {
+                padding: 25px;
+            }
+            
+            .app-container {
+                padding: 12px;
+                margin: 8px auto;
+            }
+            
             .app-header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 12px;
             }
             
             .header-buttons {
@@ -762,7 +806,7 @@
             
             .signature-section {
                 width: 100%;
-                margin-bottom: 30px;
+                margin-bottom: 25px;
             }
             
             .filter-row {
@@ -774,7 +818,7 @@
             }
             
             .invoice-table th, .invoice-table td {
-                padding: 8px;
+                padding: 6px;
             }
             
             .tabs {
@@ -783,14 +827,14 @@
             }
             
             .tab {
-                padding: 10px 18px;
-                font-size: 14px;
+                padding: 8px 15px;
+                font-size: 13px;
             }
             
             button {
-                padding: 10px 15px;
-                font-size: 14px;
-                margin-bottom: 10px;
+                padding: 8px 12px;
+                font-size: 13px;
+                margin-bottom: 8px;
             }
             
             .charts-container {
@@ -798,7 +842,7 @@
             }
             
             .chart-container {
-                height: 250px;
+                height: 220px;
             }
             
             .actions {
@@ -808,7 +852,7 @@
             
             .actions button {
                 width: 100%;
-                max-width: 300px;
+                max-width: 280px;
                 margin-right: 0;
             }
             
@@ -821,20 +865,34 @@
                 right: 10px;
                 left: 10px;
                 transform: translateY(-100px);
+                max-width: none;
             }
             
             .save-notification.show {
                 transform: translateY(0);
             }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-group {
+                flex: 1 1 100%;
+            }
         }
         
+        /* Mobiles (écrans petits) */
         @media (max-width: 480px) {
             .login-container {
-                padding: 25px;
+                padding: 20px;
+            }
+            
+            .login-container h1 {
+                font-size: 20px;
             }
             
             .app-header h1 {
-                font-size: 1.5rem;
+                font-size: 18px;
             }
             
             .form-group {
@@ -842,11 +900,15 @@
             }
             
             .invoice-title h1 {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
             }
             
             .invoice-table {
                 font-size: 10px;
+            }
+            
+            .invoice-table th, .invoice-table td {
+                padding: 4px;
             }
             
             .charts-container {
@@ -855,6 +917,75 @@
             
             .chart-container {
                 height: 200px;
+            }
+            
+            .tab {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            
+            .payment-code {
+                font-size: 14px;
+                letter-spacing: 1px;
+            }
+            
+            .invoice-code {
+                font-size: 12px;
+            }
+            
+            #qrcode {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .form-section h2, .invoice-preview h2, .history-section h2, .sales-analysis-section h2, .verify-section h2 {
+                font-size: 18px;
+            }
+        }
+        
+        /* Très petits écrans */
+        @media (max-width: 320px) {
+            .login-container {
+                padding: 15px;
+            }
+            
+            .app-container {
+                padding: 10px;
+            }
+            
+            .app-header h1 {
+                font-size: 16px;
+            }
+            
+            .tab {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+            
+            button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            
+            .invoice-container {
+                padding: 10px;
+            }
+            
+            .invoice-table {
+                font-size: 9px;
+            }
+            
+            .payment-code {
+                font-size: 12px;
+            }
+            
+            .invoice-code {
+                font-size: 11px;
+            }
+            
+            #qrcode {
+                width: 80px;
+                height: 80px;
             }
         }
     </style>
